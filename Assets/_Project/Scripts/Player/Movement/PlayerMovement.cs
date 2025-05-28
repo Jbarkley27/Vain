@@ -25,11 +25,18 @@ public class PlayerMovement : MonoBehaviour
 
     [Header("Dash Settings")]
     public bool CanDash = true;
-    [SerializeField] float _dashDrag;
+
+    // How tight the dash feels, adds resistance. Lower values makes it feel floaty
+    [SerializeField] float _dashDrag; 
     private float _defaultDrag;
+
+    // How fast the dashDrag goes back to defaultDrag. Higher values makes the change of drags more noticeable.
+    // Should keep this low ( current sweet spot = .1f)
     [SerializeField] float _resetMomentumTime;
     [SerializeField] float _dashForce;
     public bool IsDashing = false;
+
+    // Controls the burst duration. Higher values will make the dash longer.
     [SerializeField] float _dashForHowLong;
     [SerializeField] private float _dashCooldown;
     // private List<MeshRenderer> meshesToHideWhenDashing = new List<MeshRenderer>();
@@ -63,9 +70,10 @@ public class PlayerMovement : MonoBehaviour
     private void FixedUpdate()
     {
         // ensure player y position is always 0
-        transform.position = new Vector3(transform.position.x, 0, transform.position.z);
+        // transform.position = new Vector3(transform.position.x, 0, transform.position.z);
         RotateTowards(WorldCursor.instance.GetDirectionFromWorldCursor(transform.position));
         Thrust();
+        Boost();
     }
 
 
@@ -108,7 +116,7 @@ public class PlayerMovement : MonoBehaviour
     // THRUST HANDLING ------------------------------------------------------
     private void Thrust()
     {
-        if (_inputManager.ThrustInput.magnitude == 0) return;
+        if (_inputManager.ThrustInput.magnitude == 0 || _inputManager.IsBoosting) return;
 
         float xThrustInput = _inputManager.ThrustInput.x;
         float yThrustInput = _inputManager.ThrustInput.y;
@@ -137,7 +145,7 @@ public class PlayerMovement : MonoBehaviour
     {
         if (!_inputManager.IsBoosting) return;
 
-        _rb.AddForce(gameObject.transform.forward * _boostForce, ForceMode.Force);
+        _rb.AddForce(gameObject.transform.forward * _boostForce, ForceMode.Impulse);
     }
 
 
@@ -148,6 +156,25 @@ public class PlayerMovement : MonoBehaviour
 
         if (!CanDash || IsDashing) yield return null;
 
+        if (_inputManager.ThrustInput.magnitude == 0) yield return null;
+
+        float xThrustInput = _inputManager.ThrustInput.x;
+        float yThrustInput = _inputManager.ThrustInput.y;
+
+        // Project camera-relative directions onto horizontal plane
+        // Get camera-relative directions
+        Vector3 camForward = Camera.main.transform.forward;
+        Vector3 camRight = Camera.main.transform.right;
+
+        // Flatten the vectors to the XZ plane
+        camForward.y = 0;
+        camRight.y = 0;
+        camForward.Normalize();
+        camRight.Normalize();
+
+        Vector3 movementDirectionX = camRight * xThrustInput;
+        Vector3 movementDirectionY = camForward * yThrustInput;
+
         Debug.Log("Dashing");
 
         // Disable further dashes during cooldown
@@ -155,10 +182,12 @@ public class PlayerMovement : MonoBehaviour
         IsDashing = true;
 
         // Apply a force in the direction of thrust input
-        var finalDir = new Vector3(_inputManager.ThrustInput.x, 0, _inputManager.ThrustInput.y);
+        var finalDir = new Vector3(movementDirectionX.x, 0, movementDirectionY.y);
 
 
-        _rb.AddRelativeForce(finalDir * _dashForce, ForceMode.VelocityChange);
+        // _rb.AddForce(finalDir * _dashForce, ForceMode.VelocityChange);
+        _rb.AddForce(movementDirectionX * _dashForce, ForceMode.VelocityChange);
+        _rb.AddForce(movementDirectionY * _dashForce, ForceMode.VelocityChange);
 
 
         // Hide Player while dashing

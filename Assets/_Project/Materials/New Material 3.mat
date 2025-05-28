@@ -15,7 +15,6 @@ Material:
   - _MK_ENVIRONMENT_REFLECTIONS_AMBIENT
   - _MK_LIGHT_CEL
   - _MK_RECEIVE_SHADOWS
-  - _MK_SPECULAR_ISOTROPIC
   m_InvalidKeywords:
   - _MK_ARTISTIC_ANIMATION_STUTTER
   - _MK_WRAPPED_DIFFUSE
@@ -236,7 +235,7 @@ Material:
     - _SketchMapScale: 1
     - _Smoothness: 0.35
     - _SmoothnessTextureChannel: 0
-    - _Specular: 1
+    - _Specular: 0
     - _SpecularHighlights: 1
     - _SpecularIntensity: 1
     - _SpecularSmoothness: 0

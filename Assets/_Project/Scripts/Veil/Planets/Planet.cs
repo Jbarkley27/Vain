@@ -6,6 +6,7 @@ public class Planet : MonoBehaviour
     public string Name;
     [SerializeField] private List<PlanetForm> _planetForms = new List<PlanetForm>();
     [SerializeField] private PlanetZone _planetZone;
+    [SerializeField] private GameObject zoneRoot;
 
     public void CreatePlanet(Vector3 planetPosition)
     {
@@ -18,8 +19,7 @@ public class Planet : MonoBehaviour
         planetFormPrefab.name = Name;
         _planetZone.SetPlanetName(Name);
 
-        _planetZone.transform.position = planetPosition;
-        _planetZone.transform.localScale = new Vector3(Random.Range(500, 600), Random.Range(10, 20), Random.Range(500, 600));
+        zoneRoot.transform.position = new Vector3(planetPosition.x, 0, planetPosition.z);
 
         Debug.Log("Created " + Name);
     }

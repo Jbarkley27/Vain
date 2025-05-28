@@ -7,27 +7,28 @@ public class PlanetDetector : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("PlanetZone"))
+        if (other.CompareTag("PlanetRegion"))
         {
+            Debug.Log("Planet Region");
             PlanetZone planetZone = other.GetComponent<PlanetZone>();
             if (planetZone == null) return;
 
-            CurrentPlanet = planetZone.name;
+            CurrentPlanet = planetZone.PlanetName;
 
             StartCoroutine(_planetZoneUI.EnterNewZone(CurrentPlanet));
-            Debug.Log($"Player entered {planetZone.name}'s zone.");
+            Debug.Log($"Player entered {planetZone.PlanetName}'s zone.");
         }
     }
 
     private void OnTriggerExit(Collider other)
     {
-        if (other.CompareTag("PlanetZone"))
+        if (other.CompareTag("PlanetRegion"))
         {
             PlanetZone planetZone = other.GetComponent<PlanetZone>();
             if (planetZone == null) return;
 
             CurrentPlanet = "Void";
-            Debug.Log($"Player exited {planetZone.name}'s zone.");
+            Debug.Log($"Player exited {planetZone.PlanetName}'s zone.");
         }
     }
 }
