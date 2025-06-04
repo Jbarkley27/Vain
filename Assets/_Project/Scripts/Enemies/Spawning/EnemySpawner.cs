@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
@@ -11,6 +12,10 @@ public class EnemySpawner : MonoBehaviour
     public Transform player;
     public int currentTier = 1;
     public Planet planet;
+    public float despawnDelay = 10f;
+    private Coroutine despawnCoroutine;
+    private bool isPlayerInZone = false;
+    private bool enemiesSpawned = false;
 
     private List<EnemyBase> activeEnemies = new List<EnemyBase>();
 
@@ -27,6 +32,25 @@ public class EnemySpawner : MonoBehaviour
     {
         if (other.CompareTag("Player"))
         {
+            isPlayerInZone = true;
+
+            if (despawnCoroutine != null)
+            {
+                StopCoroutine(despawnCoroutine);
+                despawnCoroutine = null;
+            }
+
+            if (!enemiesSpawned)
+            {
+                SpawnWave(); // First time only
+                enemiesSpawned = true;
+                Debug.Log("Spawning Enemies for the first time");
+            }
+            else
+            {
+                Debug.Log("Player still in combat, enemy state reamins");
+            }
+
             SpawnWave();
         }
     }
@@ -35,8 +59,37 @@ public class EnemySpawner : MonoBehaviour
     {
         if (other.CompareTag("Player"))
         {
-            DespawnWave();
+            isPlayerInZone = false;
+
+            if (despawnCoroutine == null)
+            {
+                despawnCoroutine = StartCoroutine(DespawnTimer());
+            }
         }
+    }
+
+    private IEnumerator DespawnTimer()
+    {
+        Debug.Log("Player left zone, countdown started.");
+
+        float timer = 0f;
+
+        while (timer < despawnDelay)
+        {
+            if (isPlayerInZone)
+            {
+                Debug.Log("Player returned, despawn canceled.");
+                yield break; // Cancel despawn
+            }
+
+            timer += Time.deltaTime;
+            yield return null;
+        }
+
+        Debug.Log("Despawn delay reached. Resetting battle.");
+        DespawnWave();
+        enemiesSpawned = false;
+        despawnCoroutine = null;
     }
 
     void SpawnWave()
@@ -73,11 +126,11 @@ public class EnemySpawner : MonoBehaviour
         NavMeshHit hit;
         if (NavMesh.SamplePosition(point, out hit, 2f, NavMesh.AllAreas))
         {
-            Debug.Log("Position + " + hit.position);
+            // Debug.Log("Position + " + hit.position);
             return hit.position;
         }
 
-        Debug.Log("Position Outside --  " + point);
+        // Debug.Log("Position Outside --  " + point);
         return point; // fallback
     }
 }

@@ -6,6 +6,7 @@ public class InputManager : MonoBehaviour
     [Header("General")]
     private PlayerInput _playerInput;
     private PlayerMovement _playerMovement;
+    public MiniMap _miniMap;
 
     [Header("Cursor")]
     public Vector2 CursorInput;
@@ -82,6 +83,14 @@ public class InputManager : MonoBehaviour
         }
     }
 
+    public void OpenMinimap(InputAction.CallbackContext context)
+    {
+        if (context.performed)
+        {
+            _miniMap.ToggleMinimapScale();
+        }
+    }
+
 
 
     public void GetCurrentDevice()
@@ -95,4 +104,5 @@ public class InputManager : MonoBehaviour
             CurrentDevice = InputDevice.GAMEPAD;
         }
     }
+
 }
