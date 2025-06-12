@@ -16,8 +16,7 @@ public class EnemySpawner : MonoBehaviour
     private Coroutine despawnCoroutine;
     private bool isPlayerInZone = false;
     private bool enemiesSpawned = false;
-
-    private List<EnemyBase> activeEnemies = new List<EnemyBase>();
+    public List<EnemyBase> activeEnemies = new List<EnemyBase>();
 
     void Awake()
     {
@@ -34,24 +33,28 @@ public class EnemySpawner : MonoBehaviour
         {
             isPlayerInZone = true;
 
+            // If player re-enters the planet region, cancel the despawn coroutine
             if (despawnCoroutine != null)
             {
                 StopCoroutine(despawnCoroutine);
                 despawnCoroutine = null;
             }
 
+
+
             if (!enemiesSpawned)
             {
                 SpawnWave(); // First time only
                 enemiesSpawned = true;
                 Debug.Log("Spawning Enemies for the first time");
+                return;
             }
             else
             {
                 Debug.Log("Player still in combat, enemy state reamins");
             }
 
-            SpawnWave();
+            // SpawnWave(); // this was causing double enemies to spawn
         }
     }
 

@@ -3,6 +3,9 @@ using UnityEngine;
 public class GlobalDataStore : MonoBehaviour
 {
     public static GlobalDataStore Instance;
+    public PlanetDetector PlanetDetector;
+    public GameObject Player;
+    public GameObject DebugObject;
 
 
     private void Awake()
@@ -17,5 +20,8 @@ public class GlobalDataStore : MonoBehaviour
         DontDestroyOnLoad(gameObject);
     }
 
-
+    void Update()
+    {
+        // Debug.Log("PLayer Posi " + Player.transform.position);
+    }
 }

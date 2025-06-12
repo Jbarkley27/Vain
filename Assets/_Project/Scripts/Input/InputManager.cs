@@ -21,6 +21,9 @@ public class InputManager : MonoBehaviour
     [Header("Boosting")]
     public bool IsBoosting = false;
 
+    [Header("Shooting")]
+    public bool IsShooting = false;
+
     [Header("Current Device Settings")]
     public InputDevice CurrentDevice;
     public enum InputDevice { K_M, GAMEPAD };
@@ -88,6 +91,19 @@ public class InputManager : MonoBehaviour
         if (context.performed)
         {
             _miniMap.ToggleMinimapScale();
+        }
+    }
+
+
+    public void Shoot()
+    {
+        if (_playerInput.actions["Shoot"].IsPressed())
+        {
+            IsShooting = true;
+        }
+        else
+        {
+            IsShooting = false;
         }
     }
 

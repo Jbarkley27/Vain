@@ -18,7 +18,7 @@ public class Planet : MonoBehaviour
         PlanetForm planetFormPrefab = Instantiate(_planetForms[randomPlanetForm], planetPosition, Quaternion.identity, transform);
 
         planetFormPrefab.name = Name;
-        _planetZone.SetPlanetName(Name);
+        _planetZone.SetPlanetName(Name, this);
 
         zoneRoot.transform.position = new Vector3(planetPosition.x, 0, planetPosition.z);
         minimapMarker.transform.position = new Vector3(planetPosition.x, 0, planetPosition.z);

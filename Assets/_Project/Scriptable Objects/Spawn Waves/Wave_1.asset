@@ -14,5 +14,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   enemies:
   - enemyID: 0
-    count: 15
+    count: 7
     tier: 1

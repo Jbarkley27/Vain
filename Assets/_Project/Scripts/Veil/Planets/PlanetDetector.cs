@@ -4,6 +4,7 @@ public class PlanetDetector : MonoBehaviour
 {
     public string CurrentPlanet;
     [SerializeField] private PlanetZoneUI _planetZoneUI;
+    public Planet CurrentPlanetObject;
 
     private void OnTriggerEnter(Collider other)
     {
@@ -14,6 +15,7 @@ public class PlanetDetector : MonoBehaviour
             if (planetZone == null) return;
 
             CurrentPlanet = planetZone.PlanetName;
+            CurrentPlanetObject = planetZone.Planet;
 
             StartCoroutine(_planetZoneUI.EnterNewZone(CurrentPlanet));
             Debug.Log($"Player entered {planetZone.PlanetName}'s zone.");
@@ -28,7 +30,10 @@ public class PlanetDetector : MonoBehaviour
             if (planetZone == null) return;
 
             CurrentPlanet = "Void";
+            CurrentPlanetObject = null;
             Debug.Log($"Player exited {planetZone.PlanetName}'s zone.");
         }
     }
+
+    
 }

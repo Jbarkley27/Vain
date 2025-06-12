@@ -1,3 +1,5 @@
+using System.Collections;
+using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.AI;
@@ -30,22 +32,61 @@ public abstract class EnemyBase : MonoBehaviour, IPoolable
     public Rigidbody _rb;
     protected NavMeshAgent _agent;
 
+
     [Header("AI Settings")]
-    public float _detectionRange = 15f;
     public float _attackRange = 5f;
     public float _lookAtSpeed = 5f;
     public float _wanderNodeCloseRange = 2f;
     public float _stoppingDistance;
     public float _avoidanceRadius;
     public float _baseAcceleration = 20f;
+    public float minSpeed;
+    public float maxSpeed;
+    public float _newScentNodeInterval = 2;
+    public Coroutine newScentCo;
+
+
+    [Header("Attacks")]
+    public List<AttackDataBase> AvailableAttacks = new List<AttackDataBase>();
+    public bool IsAttacking { get; set; } = false;
+    public bool CanAttack { get; set; } = true;
+    public float _timeBeforeAttackMin;
+    public float _timeBeforeAttackMax;
+
+    [SerializeField] private float _castTimeMin;
+    [SerializeField] private float _castTimeMax;
+    public float CastTime;
+
+    [SerializeField] private float _coolDownMin;
+    [SerializeField] private float _coolDownMax;
+    public float CoolDown;
+
+
+
+    [Header("Sight")]
+    public float sightRadius = 10f;       // How far the enemy can see
+    public float visionWidth = 1f;        // Radius of the "vision cone" (sphere)
+    // public LayerMask detectionMask;       // What the enemy can see (e.g., Player layer)
+    public GameObject gameObjectInView;
+
 
     [Header("Runtime Debug")]
     public Transform target;
     public GameObject _currentWanderNode;
+    public Transform _currentScentNode;
+    public bool CanSeePlayer;
+
+
+
 
     protected virtual void Awake()
     {
         _agent = GetComponent<NavMeshAgent>();
+    }
+
+    private void Update()
+    {
+        CanSeePlayer = CanEnemySeePlayer();
     }
 
     protected virtual void FixedUpdate()
@@ -55,30 +96,41 @@ public abstract class EnemyBase : MonoBehaviour, IPoolable
 
 
 
+
+
+
     // Pooling | Instantiate Logic ------------------------------------------------------------------------
 
-    /// <summary>
-    /// Called by the spawner after the enemy is spawned.
-    /// </summary>
     public virtual void Setup(int worldTier, Transform playerTarget)
     {
         // randomize some of the agent properties so there is some variation in the enemy movement
-        _agent.speed = Random.Range(35f, 50f);
-        _agent.stoppingDistance = Random.Range(_stoppingDistance, _stoppingDistance + 10);
-        _agent.acceleration = Random.Range(_baseAcceleration, _baseAcceleration + 20);
+        _agent.speed = Random.Range(minSpeed, maxSpeed);
+        _agent.stoppingDistance = Random.Range(_stoppingDistance, _stoppingDistance + 5);
+        _agent.acceleration = Random.Range(_baseAcceleration, _baseAcceleration + 60);
         _agent.radius = Random.Range(_avoidanceRadius, _avoidanceRadius + 1);
 
+
+
         // set other stuff
+         _rb = GetComponent<Rigidbody>();
         _wanderNodeCloseRange = Random.Range(_wanderNodeCloseRange, _wanderNodeCloseRange + 2);
-        _lookAtSpeed = Random.Range(_lookAtSpeed, _lookAtSpeed + 2f);
-        _rb = GetComponent<Rigidbody>();
+        _attackRange += _agent.stoppingDistance;
+        _stoppingDistance = _agent.stoppingDistance;
+        _attackRange = Random.Range(_attackRange, _attackRange + 20);
+        _lookAtSpeed = Random.Range(_lookAtSpeed, _lookAtSpeed + 10f);
         target = playerTarget;
         _currentState = EnemyState.Wander;
         gameObject.name = gameObject.name + Random.Range(1f, 4f) + "";
+        _newScentNodeInterval = Random.Range(_newScentNodeInterval, _newScentNodeInterval + 3);
+        CastTime = Random.Range(_castTimeMin, _castTimeMax);
+        CoolDown = Random.Range(_coolDownMin, _coolDownMax);
+
+
 
         // Requirements to enter Wander state initially
         _currentWanderNode = EnemyManager.Instance.GetRandomWanderNodePosition();
         _agent.SetDestination(_currentWanderNode.transform.position);
+        if (newScentCo == null) newScentCo = StartCoroutine(GetRandomScentNode());
     }
 
     public virtual void OnSpawned()
@@ -93,7 +145,15 @@ public abstract class EnemyBase : MonoBehaviour, IPoolable
         _agent.enabled = false;
         _currentState = EnemyState.Wander;
     }
+    
 
+
+
+
+
+
+
+    // AI Navigation State Logic ------------------------------------------------------------------------------
     protected virtual void HandleState()
     {
         switch (_currentState)
@@ -102,7 +162,7 @@ public abstract class EnemyBase : MonoBehaviour, IPoolable
                 Wander();
                 break;
             case EnemyState.Seek:
-                ChasePlayer();
+                Seek();
                 break;
             case EnemyState.Attack:
                 Attack();
@@ -112,99 +172,153 @@ public abstract class EnemyBase : MonoBehaviour, IPoolable
 
 
 
-
-    // AI Navigation Logic
-
-
-    // protected virtual void LookForPlayer()
-    // {
-    //     if (IsPlayerInRange(_detectionRange))
-    //     {
-    //         _currentState = EnemyState.Seek;
-    //     }
-    // }
-
     protected virtual void Wander()
     {
         _agent.stoppingDistance = 1f;
+        _agent.updateRotation = true;
 
         // This will cause the enemy to choose a random wander Node and move there
         // until the player is within its range.
         if (Vector3.Distance(transform.position, _agent.destination) <= _wanderNodeCloseRange)
         {
-            // Debug.Log(gameObject.name + " is getting a new Wander Node -- " + gameObject.name);
             _currentWanderNode = EnemyManager.Instance.GetRandomWanderNodePosition();
             _agent.SetDestination(_currentWanderNode.transform.position);
         }
 
-        // Debug.Log(gameObject.name + " distance from " + _currentWanderNode.name + " is " + Vector3.Distance(transform.position, agent.destination) + " and my wanderNodeCloseRange = " + _wanderNodeCloseRange);
 
-        // if (_currentWanderNode) RotateTowards(_currentWanderNode.transform.position);
-
-
-        // if (IsPlayerInRange(detectionRange))
-        // {
-        //     currentState = EnemyState.Seek;
-        // }
+        if (GlobalDataStore.Instance.PlanetDetector.CurrentPlanetObject != null)
+        {
+            _currentScentNode = EnemyManager.Instance.GetRandomPlayerScentNode(); 
+            _currentState = EnemyState.Seek;
+        }
     }
 
 
-    public void RotateTowards(Vector3 targetDirection)
+    protected virtual void Seek()
     {
-        // Calculate the target rotation
-        Quaternion targetRotation = Quaternion.LookRotation(targetDirection);
+        RotateTowards(GlobalDataStore.Instance.Player.transform.position);
+        _agent.updateRotation = false;
+        _agent.stoppingDistance = _stoppingDistance;
+        target = GlobalDataStore.Instance.Player.transform;
 
-        // Smoothly interpolate between current and target rotation
-        Quaternion smoothedRotation = Quaternion.Slerp(
-            _rb.rotation,             // Current rotation
-            targetRotation,          // Target rotation
-            _lookAtSpeed * Time.deltaTime // Interpolation factor
-        );
-
-        // Apply the smooth rotation to the Rigidbody
-        _rb.MoveRotation(smoothedRotation);
-    }
-
-    protected virtual void ChasePlayer()
-    {
+        // SWITCH TO WANDER
         if (target == null)
         {
             _currentState = EnemyState.Wander;
             return;
         }
 
-        float dist = Vector3.Distance(transform.position, target.position);
-
-        if (dist > _detectionRange)
-        {
-            _currentState = EnemyState.Wander;
-            return;
-        }
-
-        if (dist <= _attackRange)
+        // SWITCH TO ATTACK
+        if (IsPlayerInAttackRangeOfPlayer())
         {
             _currentState = EnemyState.Attack;
-            _agent.ResetPath();
             return;
         }
 
-        _agent.SetDestination(target.position);
+        _agent.SetDestination(_currentScentNode.transform.position);
     }
+    
+
 
     protected virtual void Attack()
     {
-        Debug.Log($"{gameObject.name} is attacking.");
-        float dist = Vector3.Distance(transform.position, target.position);
-        if (dist > _attackRange)
+        Debug.Log($"{gameObject.name} is trying to attack.");
+        RotateTowards(GlobalDataStore.Instance.Player.transform.position);
+        _agent.updateRotation = false;
+
+
+        if (!IsPlayerInAttackRangeOfPlayer())
         {
+            CanAttack = true;
+            IsAttacking = false;
             _currentState = EnemyState.Seek;
         }
+
+        // attack
+        if (CanAttack && !IsAttacking)
+        {
+            StartCoroutine(InitializeAttack());
+        }
+        
+
+        _agent.SetDestination(_currentScentNode.transform.position);
     }
+
+
+
+    public IEnumerator InitializeAttack()
+    {
+        CanAttack = false;
+        IsAttacking = true;
+
+        AttackDataBase randomAttack = AvailableAttacks[Random.Range(0, AvailableAttacks.Count)];
+        if (randomAttack == null) yield break;
+
+        yield return new WaitForSeconds(Random.Range(_timeBeforeAttackMin, _timeBeforeAttackMax)
+            + CastTime);
+
+
+        StartCoroutine(randomAttack.Execute(this));
+
+        yield return new WaitForSeconds(CoolDown);
+    }
+
+
+
+
+
+
+
+    // HELPERS ------------------------------------------------------------------------------------------
 
     protected bool IsPlayerInRange(float range)
     {
         return target && Vector3.Distance(transform.position, target.position) <= range;
     }
+
+
+
+    private bool IsPlayerInAttackRangeOfPlayer()
+    {
+        return Vector3.Distance(transform.position, target.position) <= _attackRange;
+    }
+
+
+    private void RotateTowards(Vector3 targetDirection)
+    {
+
+        Quaternion targetRotation = Quaternion.LookRotation((GlobalDataStore.Instance.Player.transform.position - transform.position).normalized);
+        transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * _lookAtSpeed);
+    }
+
+
+    private bool CanEnemySeePlayer()
+    {
+        RaycastHit hit;
+
+        // Perform a SphereCast forward
+        bool hitSomething = Physics.SphereCast(
+            origin: transform.position,
+            radius: visionWidth,
+            direction: transform.forward,
+            hitInfo: out hit,
+            maxDistance: sightRadius
+        // layerMask: detectionMask
+        );
+
+        if (hitSomething)
+        {
+            if (hit.collider.gameObject.CompareTag("Player"))
+            {
+                gameObjectInView = hit.collider.gameObject;
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+
 
     protected Vector3 GetRandomNavPoint(Vector3 center, float radius)
     {
@@ -219,11 +333,38 @@ public abstract class EnemyBase : MonoBehaviour, IPoolable
         return center;
     }
 
+
+
+
+    private IEnumerator GetRandomScentNode()
+    {
+        while (true)
+        {
+            yield return new WaitForSeconds(_newScentNodeInterval);
+
+            // Current Scent Node
+            ScentNode oldNode = _currentScentNode == null ? null : _currentScentNode.gameObject.GetComponent<ScentNode>();
+            _currentScentNode = EnemyManager.Instance.GetRandomPlayerScentNode(oldNode);
+
+            // New Speed
+            _agent.speed = Random.Range(minSpeed, maxSpeed);
+
+
+        }
+
+    }
+
+
+
+
+
+
     public enum EnemyState
     {
         Wander,
         Seek,
         Attack,
+        Reposition,
         Dead
     }
 }

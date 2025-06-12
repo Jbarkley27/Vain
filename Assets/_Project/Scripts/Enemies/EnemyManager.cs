@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class EnemyManager : MonoBehaviour
@@ -6,8 +7,9 @@ public class EnemyManager : MonoBehaviour
     public static EnemyManager Instance;
     public Transform playerScentNodeParent;
     public Transform enemyWanderNodeParent;
-    public List<GameObject> PlayerScentNodes;
+    public List<ScentNode> PlayerScentNodes;
     public List<GameObject> EnemyWanderNodes;
+    public List<GameObject> EnemyRepositionNodes;
 
 
     private void Awake()
@@ -26,7 +28,8 @@ public class EnemyManager : MonoBehaviour
         PlayerScentNodes.Clear();
         foreach (Transform scentNode in playerScentNodeParent)
         {
-            PlayerScentNodes.Add(scentNode.gameObject);
+            scentNode.AddComponent<ScentNode>();
+            PlayerScentNodes.Add(scentNode.GetComponent<ScentNode>());
         }
 
         foreach (Transform scentNode in enemyWanderNodeParent)
@@ -45,8 +48,19 @@ public class EnemyManager : MonoBehaviour
         return EnemyWanderNodes[Random.Range(0, EnemyWanderNodes.Count)];
     }
 
-    public Transform GetRandomPlayerScentNode()
+    public Transform GetRandomPlayerScentNode(ScentNode usedNode = null)
     {
+        for (int i = 0; i < PlayerScentNodes.Count; i++)
+        {
+            if (!PlayerScentNodes[i].IsTaken)
+            {
+                PlayerScentNodes[i].IsTaken = true;
+                return PlayerScentNodes[i].gameObject.transform;
+            }
+        }
+
+        if (usedNode) usedNode.IsTaken = false;
+
         return PlayerScentNodes[Random.Range(0, PlayerScentNodes.Count)].transform;
     }
 }

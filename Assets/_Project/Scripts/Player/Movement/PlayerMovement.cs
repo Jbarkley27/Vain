@@ -60,6 +60,7 @@ public class PlayerMovement : MonoBehaviour
         _rb = GetComponent<Rigidbody>();
         _inputManager = GetComponent<InputManager>();
         _defaultDrag = _rb.linearDamping;
+        _boostForce = 250f;
     }
 
     void Update()
@@ -84,7 +85,7 @@ public class PlayerMovement : MonoBehaviour
         if (targetDirection == Vector3.zero)
             return;
 
-
+        // Debug.Log("Rotating");
         // Calculate the target rotation
         Quaternion targetRotation = Quaternion.LookRotation(targetDirection);
 

@@ -194,6 +194,17 @@
                     "action": "OpenMap",
                     "isComposite": false,
                     "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "65afba28-3316-48c8-b0e8-5cb3d40d6435",
+                    "path": "<Gamepad>/rightStickPress",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Gamepad",
+                    "action": "OpenMap",
+                    "isComposite": false,
+                    "isPartOfComposite": false
                 }
             ]
         }

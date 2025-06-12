@@ -777,15 +777,32 @@ MonoBehaviour:
   EnemyID: 0
   _currentState: 0
   _rb: {fileID: 0}
-  _detectionRange: 15
-  _attackRange: 5
-  _lookAtSpeed: 8
+  _attackRange: 10
+  _lookAtSpeed: 5
   _wanderNodeCloseRange: 10
   _stoppingDistance: 1
-  _avoidanceRadius: 5
-  _baseAcceleration: 20
+  _avoidanceRadius: 4
+  _baseAcceleration: 5
+  minSpeed: 35
+  maxSpeed: 50
+  _newScentNodeInterval: 4
+  AvailableAttacks:
+  - {fileID: 11400000, guid: 2e3a324e51f45449187911ab1e5db827, type: 2}
+  _timeBeforeAttackMin: 1
+  _timeBeforeAttackMax: 4
+  _castTimeMin: 0.5
+  _castTimeMax: 2
+  CastTime: 0
+  _coolDownMin: 3
+  _coolDownMax: 8
+  CoolDown: 0
+  sightRadius: 10
+  visionWidth: 3
+  gameObjectInView: {fileID: 0}
   target: {fileID: 0}
   _currentWanderNode: {fileID: 0}
+  _currentScentNode: {fileID: 0}
+  CanSeePlayer: 0
 --- !u!195 &2894944222097087603
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -799,11 +816,11 @@ NavMeshAgent:
   m_Speed: 2
   m_Acceleration: 8
   avoidancePriority: 50
-  m_AngularSpeed: 120
+  m_AngularSpeed: 200
   m_StoppingDistance: 5
   m_AutoTraverseOffMeshLink: 0
   m_AutoBraking: 1
-  m_AutoRepath: 0
+  m_AutoRepath: 1
   m_Height: 0.00001
   m_BaseOffset: -3
   m_WalkableMask: 1
