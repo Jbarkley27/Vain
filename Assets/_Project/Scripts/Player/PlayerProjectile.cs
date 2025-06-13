@@ -23,7 +23,15 @@ public class PlayerProjectile : ProjectileBase
         if (collision.gameObject.CompareTag("Enemy"))
         {
             Debug.Log($"Hit Enemy {collision.gameObject.name}");
-            // PlayerHealth.Instance.TakeDamage(damage);
+            EnemyBase enemy = collision.gameObject.GetComponent<EnemyBase>();
+
+            if (!enemy)
+            {
+                // Debug.Log(collision.gameObject.transform.root.gameObject.GetComponent<EnemyBase>());
+                return;
+            }
+
+            enemy.TakeDamage(damage);
             Destroy(gameObject);
         }
     }

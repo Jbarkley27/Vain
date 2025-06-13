@@ -1,0 +1,61 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c5df7dc64790d4b7681bc9fba769e857, type: 3}
+  m_Name: Blaster_1
+  m_EditorClassIdentifier: 
+  itemName: Blaster
+  description: 
+  icon: {fileID: 21300000, guid: f8de00612eb8c4a9ba5a7d054a2f6cd9, type: 3}
+  FireRate: 0.1
+  MaxAmmo: 50
+  CooldownRate: 0
+  BaseDamage: 2
+  RegenRate: 0.2
+  CurrentAmmo: 16
+  ProjectilePrefab: {fileID: 8010873185767639128, guid: eb84250b586134b8cbd44a0c16b539db, type: 3}
+  Accuracy: 0
+  BurstAmount: 1
+  BurstTime: 0
+  BurstAmountPerShot: 1
+  BurstAmountPerShotFireRate: 0
+  ProjectileSpeed: 130
+  Range: 5
+  FireType: 0
+  animationCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  BlasterIcon: {fileID: 21300000, guid: f8de00612eb8c4a9ba5a7d054a2f6cd9, type: 3}
+  ScreenShakeProfile:
+    amplitudeGain: 1
+    frequencyGain: 2
+    shakeDuration: 0.2

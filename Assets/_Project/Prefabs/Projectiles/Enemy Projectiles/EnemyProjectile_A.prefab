@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 7580382816364722834}
   - component: {fileID: 3882057123974295288}
   m_Layer: 0
-  m_Name: RadialProjectile_A
+  m_Name: EnemyProjectile_A
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

@@ -9,6 +9,7 @@ TagManager:
   - PlanetRegion
   - PlanetEnemyArea
   - PlayerIcon
+  - Enemy
   layers:
   - Default
   - TransparentFX

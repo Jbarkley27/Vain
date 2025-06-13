@@ -722,7 +722,7 @@ SphereCollider:
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 3
   m_Radius: 4
   m_Center: {x: 0, y: 0, z: 0}
@@ -738,9 +738,10 @@ GameObject:
   - component: {fileID: 2164090299970486803}
   - component: {fileID: 2894944222097087603}
   - component: {fileID: 9098130642266119595}
+  - component: {fileID: 6833046797504528415}
   m_Layer: 0
   m_Name: Grunt
-  m_TagString: Untagged
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -777,6 +778,7 @@ MonoBehaviour:
   EnemyID: 0
   _currentState: 0
   _rb: {fileID: 0}
+  IsSetup: 0
   _attackRange: 10
   _lookAtSpeed: 5
   _wanderNodeCloseRange: 10
@@ -803,6 +805,10 @@ MonoBehaviour:
   _currentWanderNode: {fileID: 0}
   _currentScentNode: {fileID: 0}
   CanSeePlayer: 0
+  healthBarPrefab: {fileID: 8069898613419892007, guid: 49ec16da15991486bb1d5161c694b5d6, type: 3}
+  healthUI: {fileID: 0}
+  MaxHealth: 40
+  CurrentHealth: 0
 --- !u!195 &2894944222097087603
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -852,6 +858,27 @@ Rigidbody:
   m_Interpolate: 1
   m_Constraints: 84
   m_CollisionDetection: 2
+--- !u!135 &6833046797504528415
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7890397609005815511}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Radius: 3
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &8117114540213977017
 GameObject:
   m_ObjectHideFlags: 0

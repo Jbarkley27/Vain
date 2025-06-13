@@ -1,6 +1,5 @@
 using UnityEngine;
 using System.Collections;
-using UnityEditor.Experimental.GraphView;
 
 [CreateAssetMenu(fileName = "New Frame", menuName = "Item/Frame")]
 public class Frame : ItemObject

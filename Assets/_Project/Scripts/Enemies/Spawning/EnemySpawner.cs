@@ -105,7 +105,7 @@ public class EnemySpawner : MonoBehaviour
                 Vector3 spawnPos = GetValidSpawnPosition();
                 GameObject enemyObj = pooler.Spawn(entry.enemyID, spawnPos, Quaternion.identity);
                 EnemyBase enemy = enemyObj.GetComponent<EnemyBase>();
-                enemy.Setup(entry.tier, player);
+                if (!enemy.IsSetup) enemy.Setup(entry.tier, player);
                 activeEnemies.Add(enemy);
             }
         }

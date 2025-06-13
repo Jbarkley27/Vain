@@ -31,6 +31,7 @@ public abstract class EnemyBase : MonoBehaviour, IPoolable
     public EnemyState _currentState = EnemyState.Wander;
     public Rigidbody _rb;
     protected NavMeshAgent _agent;
+    public bool IsSetup = false;
 
 
     [Header("AI Settings")]
@@ -76,6 +77,14 @@ public abstract class EnemyBase : MonoBehaviour, IPoolable
     public Transform _currentScentNode;
     public bool CanSeePlayer;
 
+    [Header("UI")]
+    [SerializeField] private GameObject healthBarPrefab;
+    public EnemyHealthUI healthUI;
+
+    [Header("Health")] // TODO : Move to Stats Class
+    public int MaxHealth;
+    public int CurrentHealth;
+
 
 
 
@@ -103,6 +112,8 @@ public abstract class EnemyBase : MonoBehaviour, IPoolable
 
     public virtual void Setup(int worldTier, Transform playerTarget)
     {
+        if (IsSetup) return;
+
         // randomize some of the agent properties so there is some variation in the enemy movement
         _agent.speed = Random.Range(minSpeed, maxSpeed);
         _agent.stoppingDistance = Random.Range(_stoppingDistance, _stoppingDistance + 5);
@@ -112,7 +123,7 @@ public abstract class EnemyBase : MonoBehaviour, IPoolable
 
 
         // set other stuff
-         _rb = GetComponent<Rigidbody>();
+        _rb = GetComponent<Rigidbody>();
         _wanderNodeCloseRange = Random.Range(_wanderNodeCloseRange, _wanderNodeCloseRange + 2);
         _attackRange += _agent.stoppingDistance;
         _stoppingDistance = _agent.stoppingDistance;
@@ -131,6 +142,16 @@ public abstract class EnemyBase : MonoBehaviour, IPoolable
         _currentWanderNode = EnemyManager.Instance.GetRandomWanderNodePosition();
         _agent.SetDestination(_currentWanderNode.transform.position);
         if (newScentCo == null) newScentCo = StartCoroutine(GetRandomScentNode());
+
+
+        // Setup Health
+        CurrentHealth = MaxHealth;
+
+
+        // Setup UI
+        CreateHealthUI();
+
+        IsSetup = true;
     }
 
     public virtual void OnSpawned()
@@ -138,18 +159,35 @@ public abstract class EnemyBase : MonoBehaviour, IPoolable
         if (_agent == null) _agent = GetComponent<NavMeshAgent>();
         _agent.enabled = true;
         gameObject.SetActive(true);
+        if (healthUI) healthUI.gameObject.SetActive(true);
     }
 
     public virtual void OnDespawned()
     {
         _agent.enabled = false;
         _currentState = EnemyState.Wander;
+        if (healthUI) healthUI.gameObject.SetActive(false);
     }
     
 
+    void CreateHealthUI()
+    {
+        GameObject uiInstance = Instantiate(
+            healthBarPrefab,
+            EnemyUIManager.Instance.enemyUICanvas.transform
+        );
+
+        healthUI = uiInstance.GetComponent<EnemyHealthUI>();
+        healthUI.SetTarget(this); // `this` = enemy
+    }
 
 
-
+    public void TakeDamage(int damage)
+    {
+        Debug.Log("enemy taking dage");
+        CurrentHealth = Mathf.Clamp(CurrentHealth - damage, 0, MaxHealth);
+        healthUI.UpdateHealthText();
+    }
 
 
 

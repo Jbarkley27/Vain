@@ -1,5 +1,6 @@
 
 using UnityEngine;
+using UnityEngine.UI;
 
 [CreateAssetMenu(fileName = "New Blaster", menuName = "Item/Blaster")]
 public class Blaster : ItemObject
@@ -20,6 +21,15 @@ public class Blaster : ItemObject
     public float Range;
     public enum BlasterFireType {AUTO, MANUAL};
     public BlasterFireType FireType;
+    public AnimationCurve animationCurve;
+    public Sprite BlasterIcon;
+    public ScreenShakeManager.ShakeProfile ScreenShakeProfile;
+
+
+    private void Start()
+    {
+        // CurrentAmmo = MaxAmmo;
+    }
 
 
 

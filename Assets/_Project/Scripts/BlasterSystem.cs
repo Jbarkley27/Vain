@@ -22,12 +22,11 @@ public class WeaponSystems : MonoBehaviour
 
     [Header("Regeneration")]
     public bool isRegeneratingAmmo = false;
-    public bool canRegenerateAmmo = false;
+    public bool canRegenerateAmmo = true;
 
     [Header("Firing Status")]
     public bool isShooting = false;
 
-    Coroutine activeCooldownCo;
     Coroutine RegenCo;
 
     [Header("Equipped Blaster")]
@@ -38,6 +37,12 @@ public class WeaponSystems : MonoBehaviour
     // could be useful for status effects or when swapping and equipping
     // weapons new weapons
     public bool CanShoot = true;
+
+
+    [Header("UI")]
+    public TMP_Text currentAmmo;
+    public TMP_Text maxAmmo;
+    public Image blasterIcon;
 
     
 
@@ -54,15 +59,26 @@ public class WeaponSystems : MonoBehaviour
     }
 
 
+    void Start()
+    {
+        InitiateUI();
+    }
+
+
+    public void InitiateUI()
+    {
+        if (!EquippedBlaster) return;
+        EquippedBlaster.CurrentAmmo = EquippedBlaster.MaxAmmo;
+        currentAmmo.text = EquippedBlaster.CurrentAmmo + "";
+        maxAmmo.text = EquippedBlaster.MaxAmmo + "";
+        blasterIcon.sprite = EquippedBlaster.BlasterIcon;
+    }
+
 
 
     void Update()
     {
         ListenForShooting();
-        if (!isShooting && canRegenerateAmmo && RegenCo == null)
-        {
-            RegenCo = StartCoroutine(RegenBlasterAmmo());
-        }
     }
 
 
@@ -97,7 +113,18 @@ public class WeaponSystems : MonoBehaviour
         StartCoroutine(ShootBlaster());
     }
 
+    public bool HasAmmo(int amount = 1)
+    {
+        if (!EquippedBlaster) return false;
+        return EquippedBlaster.CurrentAmmo - amount >= 0;
+    }
 
+    public void UpdateUI()
+    {
+        if (!EquippedBlaster) return;
+        currentAmmo.text = EquippedBlaster.CurrentAmmo + "";
+        maxAmmo.text = EquippedBlaster.MaxAmmo + "";
+    }
 
 
     public IEnumerator ShootBlaster()
@@ -106,16 +133,22 @@ public class WeaponSystems : MonoBehaviour
         {
             for (int j = 0; j < EquippedBlaster.BurstAmountPerShot; j++)
             {
+                if (!HasAmmo()) break;
+
                 GameObject projectile = Instantiate(
                     EquippedBlaster.ProjectilePrefab,
                     _playerFireSource.transform.position,
                     Quaternion.identity);
 
-                projectile.GetComponent<PlayerProjectile>().Initialize(GetProjectileDirection(EquippedBlaster.Accuracy), EquippedBlaster.ProjectileSpeed, null, EquippedBlaster.Range, EquippedBlaster.BaseDamage);
+                ScreenShakeManager.Instance.DoShake(EquippedBlaster.ScreenShakeProfile);
 
+                projectile.GetComponent<PlayerProjectile>().Initialize(GetProjectileDirection(EquippedBlaster.Accuracy), EquippedBlaster.ProjectileSpeed, EquippedBlaster.animationCurve, EquippedBlaster.Range, EquippedBlaster.BaseDamage);
+
+                EquippedBlaster.CurrentAmmo--;
+                UpdateUI();
                 yield return new WaitForSeconds(EquippedBlaster.BurstAmountPerShotFireRate);
-            }
 
+            }
             yield return new WaitForSeconds(EquippedBlaster.FireRate);
         }
 
@@ -134,6 +167,11 @@ public class WeaponSystems : MonoBehaviour
         isCoolingDown = false;
         isRegeneratingAmmo = false;
         canRegenerateAmmo = true;
+
+        if (!isShooting && canRegenerateAmmo)
+        {
+            RegenCo = StartCoroutine(RegenBlasterAmmo());
+        }
     }
 
 
@@ -141,6 +179,8 @@ public class WeaponSystems : MonoBehaviour
     // Cooldown Stuff
     public IEnumerator RegenBlasterAmmo()
     {
+        yield return new WaitForSeconds(2f);
+
         if (EquippedBlaster.CurrentAmmo >= EquippedBlaster.MaxAmmo) yield break;
         if (isShooting) yield break;
         if (isRegeneratingAmmo) yield break;
@@ -148,6 +188,7 @@ public class WeaponSystems : MonoBehaviour
         while (EquippedBlaster.CurrentAmmo < EquippedBlaster.MaxAmmo && !isShooting)
         {
             EquippedBlaster.CurrentAmmo += 1;
+            UpdateUI();
             yield return new WaitForSeconds(EquippedBlaster.RegenRate);
         }
     }
@@ -167,7 +208,7 @@ public class WeaponSystems : MonoBehaviour
         float y = yFactor * spread * GetRandomNegOrPositive();
 
         //calc new direction with spread
-        Vector3 directionWithSpread = directionWithoutSpread + new Vector3(0, y, 0); // add spread to last digit
+        Vector3 directionWithSpread = directionWithoutSpread + new Vector3(y, 0, 0); // add spread to last digit
 
         return directionWithSpread.normalized;
     }

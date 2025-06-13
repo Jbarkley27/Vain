@@ -41,6 +41,7 @@ public class InputManager : MonoBehaviour
     {
         GetCurrentDevice();
         Boost();
+        Shoot();
     }
 
 
