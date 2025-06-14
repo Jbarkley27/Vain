@@ -27,6 +27,9 @@ public class RadialAttackData : AttackDataBase
             yield break;
         }
 
+        // Disable enemy attack while firing
+        enemy.SetCanMove(false);
+
 
         float angleStep;
         float startAngle;
@@ -92,6 +95,8 @@ public class RadialAttackData : AttackDataBase
 
         enemy.CanAttack = true;
         enemy.IsAttacking = false;
+        enemy.SetCanMove(true);
+
     }
 
     void FireProjectile(Vector3 direction, EnemyBase enemy)

@@ -49,8 +49,7 @@ public class PlayerHealth : MonoBehaviour
 
     public void TakeDamage(int damage)
     {
-        _heartIcon.transform.DOPunchScale(new Vector3(1.1f, 1.1f, 1.1f), .4f, 6, 1f);
-        _heartIcon.GetComponent<Image>().DOColor(_heartHitColor, .7f)
+        _heartIcon.GetComponent<Image>().DOColor(_heartHitColor, .3f)
         .OnComplete(() =>
         {
             _heartIcon.GetComponent<Image>().color = _originalHeartIconColor;

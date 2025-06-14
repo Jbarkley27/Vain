@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1a1f4fb786b2a466a9b4a428e3ad4eb8, type: 3}
+  m_Name: Bloom
+  m_EditorClassIdentifier: 
+  itemName: Bloom
+  description: Emit a corrosive blast
+  icon: {fileID: 21300000, guid: 2b84c44041f6d45a4a540a9494f9f682, type: 3}
+  castTime: 1
+  rechargeTime: 7
+  baseDamage: 2
+  baseCooldownRate: 0
+  skillIcon: {fileID: 21300000, guid: 2b84c44041f6d45a4a540a9494f9f682, type: 3}
+  elementType: 3

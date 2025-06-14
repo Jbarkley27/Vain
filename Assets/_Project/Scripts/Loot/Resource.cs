@@ -1,19 +1,45 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using DG.Tweening;
 
-[CreateAssetMenu(fileName = "New Resource", menuName = "Item/Resource")]
-public class Resource : ItemObject
+[RequireComponent(typeof(Collider), typeof(Rigidbody))]
+public class Resource : MonoBehaviour
 {
-    public Color color;
-    // public ItemDatabase.ResourceIds resourceId;
-    public int amountInInventory;
+    public bool ShouldTrackOnDrop = false;
+    public float TrackSpeed;
+    public enum ResourceType { ION, ORB, UPGRADE };
+    public ResourceType resourceType;
+    public int amount;
 
-    public override ItemObject GetItem() { return this; }
-    public override Blaster GetBlaster() { return null; }
-    public override Skill GetSkill() { return null; }
-    public override Resource GetResource() { return this; }
-    public override Augment GetAugment() { return null; }
-    public override KeyItem GetKeyItem() { return null; }
-    public override Frame GetFrame() { return null; }
+    void Start()
+    {
+        if (TrackSpeed != 0 ) TrackSpeed = Random.Range(TrackSpeed, TrackSpeed + 3f);
+    }
+
+    void Update()
+    {
+        if (ShouldTrackOnDrop)
+        {
+            // Smoothly track the player if ShouldTrackOnDrop is true
+            Transform playerTransform = GlobalDataStore.Instance.Player.transform;
+            transform.position = Vector3.Lerp(transform.position, playerTransform.position, TrackSpeed * Time.deltaTime);
+        }
+    }
+
+    void OnTriggerEnter(Collider other)
+    {
+        if (other.CompareTag("Player"))
+        {
+            // Assuming Player has a method to collect resources
+            Inventory.Instance.AddResource(resourceType, amount);
+
+            gameObject.transform.DOScale(Vector3.zero, 0.2f)
+            .SetEase(Ease.InBack)
+            .OnComplete(() =>
+            {
+                Destroy(gameObject);
+            });
+        }
+    }
 }

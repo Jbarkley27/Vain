@@ -779,6 +779,8 @@ MonoBehaviour:
   _currentState: 0
   _rb: {fileID: 0}
   IsSetup: 0
+  Spawner: {fileID: 0}
+  CanRotate: 1
   _attackRange: 10
   _lookAtSpeed: 5
   _wanderNodeCloseRange: 10
@@ -788,6 +790,13 @@ MonoBehaviour:
   minSpeed: 35
   maxSpeed: 50
   _newScentNodeInterval: 4
+  Rewards:
+  - resourceType: 0
+    amount: 4
+  - resourceType: 2
+    amount: 1
+  - resourceType: 1
+    amount: 2
   AvailableAttacks:
   - {fileID: 11400000, guid: 2e3a324e51f45449187911ab1e5db827, type: 2}
   _timeBeforeAttackMin: 1

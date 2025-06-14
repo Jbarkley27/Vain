@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
+using Random=UnityEngine.Random;
 
 public class EnemySpawner : MonoBehaviour
 {
@@ -105,9 +106,30 @@ public class EnemySpawner : MonoBehaviour
                 Vector3 spawnPos = GetValidSpawnPosition();
                 GameObject enemyObj = pooler.Spawn(entry.enemyID, spawnPos, Quaternion.identity);
                 EnemyBase enemy = enemyObj.GetComponent<EnemyBase>();
-                if (!enemy.IsSetup) enemy.Setup(entry.tier, player);
+                if (!enemy.IsSetup) enemy.Setup(entry.tier, player, this);
                 activeEnemies.Add(enemy);
             }
+        }
+    }
+
+    public void DespawnEnemy(GameObject enemyObj)
+    {
+        if (enemyObj == null)
+        {
+            Debug.LogWarning("Enemy object is null.");
+            return;
+        }
+
+        EnemyBase enemy = enemyObj.GetComponent<EnemyBase>();
+        if (activeEnemies.Contains(enemy))
+        {
+            activeEnemies.Remove(enemy);
+            pooler.Despawn(enemyObj, enemy.EnemyID);
+            Debug.Log("Despawned enemy: " + enemy.EnemyID);
+        }
+        else
+        {
+            Debug.LogWarning("Enemy not found in active list: " + enemy.EnemyID);
         }
     }
 

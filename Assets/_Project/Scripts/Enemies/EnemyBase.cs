@@ -1,8 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.AI;
+using Random=UnityEngine.Random;
+
 
 /*
  *Create Scent Nodes 
@@ -32,6 +33,8 @@ public abstract class EnemyBase : MonoBehaviour, IPoolable
     public Rigidbody _rb;
     protected NavMeshAgent _agent;
     public bool IsSetup = false;
+    public EnemySpawner Spawner;
+    public bool CanRotate = true;
 
 
     [Header("AI Settings")]
@@ -45,6 +48,16 @@ public abstract class EnemyBase : MonoBehaviour, IPoolable
     public float maxSpeed;
     public float _newScentNodeInterval = 2;
     public Coroutine newScentCo;
+
+    [System.Serializable]
+    public struct Reward
+    {
+        public Resource.ResourceType resourceType;
+        public int amount;
+    }
+
+    [Header("Rewards")]
+    public List<Reward> Rewards = new List<Reward>();
 
 
     [Header("Attacks")]
@@ -110,7 +123,8 @@ public abstract class EnemyBase : MonoBehaviour, IPoolable
 
     // Pooling | Instantiate Logic ------------------------------------------------------------------------
 
-    public virtual void Setup(int worldTier, Transform playerTarget)
+    public virtual void Setup(int worldTier, Transform playerTarget, EnemySpawner spawner)
+
     {
         if (IsSetup) return;
 
@@ -119,6 +133,8 @@ public abstract class EnemyBase : MonoBehaviour, IPoolable
         _agent.stoppingDistance = Random.Range(_stoppingDistance, _stoppingDistance + 5);
         _agent.acceleration = Random.Range(_baseAcceleration, _baseAcceleration + 60);
         _agent.radius = Random.Range(_avoidanceRadius, _avoidanceRadius + 1);
+        Spawner = spawner;
+        CanRotate = true;
 
 
 
@@ -187,6 +203,11 @@ public abstract class EnemyBase : MonoBehaviour, IPoolable
         Debug.Log("enemy taking dage");
         CurrentHealth = Mathf.Clamp(CurrentHealth - damage, 0, MaxHealth);
         healthUI.UpdateHealthText();
+
+        if (CurrentHealth <= 0)
+        {
+            InitiateDeath();
+        }
     }
 
 
@@ -279,7 +300,7 @@ public abstract class EnemyBase : MonoBehaviour, IPoolable
         }
         
 
-        _agent.SetDestination(_currentScentNode.transform.position);
+        if (!IsAttacking) _agent.SetDestination(_currentScentNode.transform.position);
     }
 
 
@@ -288,6 +309,7 @@ public abstract class EnemyBase : MonoBehaviour, IPoolable
     {
         CanAttack = false;
         IsAttacking = true;
+
 
         AttackDataBase randomAttack = AvailableAttacks[Random.Range(0, AvailableAttacks.Count)];
         if (randomAttack == null) yield break;
@@ -356,6 +378,16 @@ public abstract class EnemyBase : MonoBehaviour, IPoolable
         return false;
     }
 
+    public void SetCanMove(bool canMove)
+    {
+        if (_agent != null)
+        {
+            _agent.isStopped = !canMove;
+            _agent.updatePosition = canMove;
+            _agent.updateRotation = canMove;
+        }
+    }
+
 
 
     protected Vector3 GetRandomNavPoint(Vector3 center, float radius)
@@ -389,11 +421,33 @@ public abstract class EnemyBase : MonoBehaviour, IPoolable
 
 
         }
-
     }
 
 
+    public void InitiateDeath()
+    {
+        CanRotate = false;
+        Debug.Log($"{gameObject.name} has died.");
+        _currentState = EnemyState.Dead;
+        _agent.enabled = false;
+        gameObject.SetActive(false);
+        IsSetup = false;
+        if (healthUI) healthUI.gameObject.SetActive(false);
+        DropRewards();
+        Spawner.DespawnEnemy(gameObject);
+    }
 
+
+    public void DropRewards()
+    {
+        foreach (var reward in Rewards)
+        {
+            for (int i = 0; i < reward.amount; i++)
+            {
+                ResourceManager.Instance.SpawnResource(reward.resourceType, transform.position);
+            }
+        }
+    }
 
 
 

@@ -13,7 +13,6 @@ public abstract class ItemObject : ScriptableObject
     public abstract ItemObject GetItem();
     public abstract Blaster GetBlaster();
     public abstract Skill GetSkill();
-    public abstract Resource GetResource();
     public abstract Augment GetAugment();
     public abstract KeyItem GetKeyItem();
     public abstract Frame GetFrame();

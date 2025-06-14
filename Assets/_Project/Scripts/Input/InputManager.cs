@@ -109,6 +109,54 @@ public class InputManager : MonoBehaviour
     }
 
 
+    public void UseSkill1(InputAction.CallbackContext context)
+    {
+        if (context.performed)
+        {
+            if (PlayerSkillManager.Instance != null)
+            {
+                PlayerSkillManager.Instance.UseSkill(0);
+            }
+            else
+            {
+                Debug.LogWarning("PlayerSkillManager instance is not available.");
+            }
+        }
+    }
+
+
+    public void UseSkill2(InputAction.CallbackContext context)
+    {
+        if (context.performed)
+        {
+            if (PlayerSkillManager.Instance != null)
+            {
+                PlayerSkillManager.Instance.UseSkill(1);
+            }
+            else
+            {
+                Debug.LogWarning("PlayerSkillManager instance is not available.");
+            }
+        }
+    }
+
+
+    public void UseSkill3(InputAction.CallbackContext context)
+    {
+        if (context.performed)
+        {
+            if (PlayerSkillManager.Instance != null)
+            {
+                PlayerSkillManager.Instance.UseSkill(2);
+            }
+            else
+            {
+                Debug.LogWarning("PlayerSkillManager instance is not available.");
+            }
+        }
+    }
+
+
 
     public void GetCurrentDevice()
     {

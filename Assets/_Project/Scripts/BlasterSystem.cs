@@ -3,6 +3,7 @@ using UnityEngine;
 using TMPro;
 using FMODUnity;
 using UnityEngine.UI;
+using Random=UnityEngine.Random;
 
 // LEGEND
 // COOLDOWN - mean how long it takes before a weapon begins to regenerate
