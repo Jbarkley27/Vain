@@ -26,8 +26,9 @@ public class WorldCursor : MonoBehaviour
 
     void Update()
     {
-        CursorUI();
         Cursor.visible = false;
+        if (ExtractionManager.Instance.IsExtracting()) return;
+        CursorUI();
     }
 
 
@@ -67,6 +68,12 @@ public class WorldCursor : MonoBehaviour
 
     public void MovePhysicalCursor()
     {
+        if (ExtractionManager.Instance.IsExtracting()) return;
+        if (Camera.main == null || _physicalWorldCursor == null)
+        {
+            Debug.LogWarning("Camera.main or physicalWorldCursor is null");
+            return;
+        }
         // raycast to get the position of the line end
         Ray ray = Camera.main.ScreenPointToRay(_cursorUI.GetComponent<RectTransform>().position);
         RaycastHit hit;

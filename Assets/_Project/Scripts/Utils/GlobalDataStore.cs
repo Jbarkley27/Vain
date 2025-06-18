@@ -1,3 +1,4 @@
+using Unity.Cinemachine;
 using UnityEngine;
 
 public class GlobalDataStore : MonoBehaviour
@@ -6,7 +7,10 @@ public class GlobalDataStore : MonoBehaviour
     public PlanetDetector PlanetDetector;
     public GameObject Player;
     public GameObject DebugObject;
+    public InputManager InputManager;
 
+    public CinemachineCamera VirtualCameraVeil;
+    public CinemachineCamera VirtualCameraBastion;
 
     private void Awake()
     {
@@ -23,5 +27,10 @@ public class GlobalDataStore : MonoBehaviour
     void Update()
     {
         // Debug.Log("PLayer Posi " + Player.transform.position);
+    }
+
+    public CinemachineCamera CorrectCamera()
+    {
+        return VirtualCameraVeil;
     }
 }

@@ -77,4 +77,5 @@ public class ResourceManager : MonoBehaviour
         Vector2 offset = Random.insideUnitCircle * radius;
         return new Vector3(center.x + offset.x, center.y, center.z + offset.y);
     }
+    
 }

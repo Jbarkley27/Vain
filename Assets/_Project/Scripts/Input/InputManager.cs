@@ -24,6 +24,10 @@ public class InputManager : MonoBehaviour
     [Header("Shooting")]
     public bool IsShooting = false;
 
+    [Header("Confirm Prompt")]
+    public bool ConfirmPromptPressed = false;
+
+
     [Header("Current Device Settings")]
     public InputDevice CurrentDevice;
     public enum InputDevice { K_M, GAMEPAD };
@@ -40,8 +44,8 @@ public class InputManager : MonoBehaviour
     void Update()
     {
         GetCurrentDevice();
-        Boost();
-        Shoot();
+        if (!ExtractionManager.Instance.IsExtracting()) Boost();
+        if (!ExtractionManager.Instance.IsExtracting()) Shoot();
     }
 
 
@@ -56,6 +60,8 @@ public class InputManager : MonoBehaviour
 
     public void Thrust(InputAction.CallbackContext context)
     {
+        if (ExtractionManager.Instance.IsExtracting()) return;
+
         if (context.performed)
         {
             ThrustInput = context.ReadValue<Vector2>();
@@ -64,6 +70,7 @@ public class InputManager : MonoBehaviour
 
     public void Dash(InputAction.CallbackContext context)
     {
+        if (ExtractionManager.Instance.IsExtracting()) return;
         if (context.performed)
         {
             DashPressed = true;
@@ -77,6 +84,7 @@ public class InputManager : MonoBehaviour
 
     public void Boost()
     {
+
         if (_playerInput.actions["Boost"].IsPressed())
         {
             IsBoosting = true;
@@ -89,6 +97,7 @@ public class InputManager : MonoBehaviour
 
     public void OpenMinimap(InputAction.CallbackContext context)
     {
+        if (ExtractionManager.Instance.IsExtracting()) return;
         if (context.performed)
         {
             _miniMap.ToggleMinimapScale();
@@ -98,6 +107,7 @@ public class InputManager : MonoBehaviour
 
     public void Shoot()
     {
+
         if (_playerInput.actions["Shoot"].IsPressed())
         {
             IsShooting = true;
@@ -111,6 +121,7 @@ public class InputManager : MonoBehaviour
 
     public void UseSkill1(InputAction.CallbackContext context)
     {
+        if (ExtractionManager.Instance.IsExtracting()) return;
         if (context.performed)
         {
             if (PlayerSkillManager.Instance != null)
@@ -127,6 +138,7 @@ public class InputManager : MonoBehaviour
 
     public void UseSkill2(InputAction.CallbackContext context)
     {
+        if (ExtractionManager.Instance.IsExtracting()) return;
         if (context.performed)
         {
             if (PlayerSkillManager.Instance != null)
@@ -141,8 +153,23 @@ public class InputManager : MonoBehaviour
     }
 
 
+    public void ConfirmPrompt(InputAction.CallbackContext context)
+    {
+        if (ExtractionManager.Instance.IsExtracting()) return;
+        if (context.performed)
+        {
+            ConfirmPromptPressed = true;
+        }
+        else if (context.canceled)
+        {
+            ConfirmPromptPressed = false;
+        }
+    }
+
+
     public void UseSkill3(InputAction.CallbackContext context)
     {
+        if (ExtractionManager.Instance.IsExtracting()) return;
         if (context.performed)
         {
             if (PlayerSkillManager.Instance != null)

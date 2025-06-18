@@ -23,12 +23,4 @@ MonoBehaviour:
   - {x: 526, y: 0, z: 1161}
   - {x: -354, y: 0, z: -698}
   - {x: 1276, y: 0, z: -1002}
-  availableLandmarkLocations:
-  - {x: 704, y: 0, z: 339}
-  - {x: 765, y: 0, z: -1526}
-  - {x: -556, y: 0, z: -1617}
-  - {x: 1441, y: 0, z: -293}
-  - {x: -730, y: 0, z: 545}
-  - {x: -1757, y: 0, z: 32}
-  - {x: -1312, y: 0, z: -1126}
-  - {x: 94, y: 0, z: 1494}
+  availableLandmarkLocations: []

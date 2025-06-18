@@ -26,6 +26,10 @@ public class MiniMap : MonoBehaviour
     public GameObject mapKeyUIRoot;
     public CanvasGroup mapKeyCG;
 
+    public static List<MinimapIcon> nonSpecialUIMarkers = new List<MinimapIcon>();
+    public float smallMiniMapScale = 0.125f;
+    public float largeMiniMapScale = 4f;
+
     private void Start()
     {
         Minimize();
@@ -43,6 +47,14 @@ public class MiniMap : MonoBehaviour
         }
 
         IsFullscreen = isFullscreen;
+    }
+
+    public static void AddNonSpecialUIMarker(MinimapIcon marker)
+    {
+        if (!nonSpecialUIMarkers.Contains(marker))
+        {
+            nonSpecialUIMarkers.Add(marker);
+        }
     }
 
     public void ToggleMinimapScale()
@@ -84,6 +96,11 @@ public class MiniMap : MonoBehaviour
         {
             miniMapOnlyElements[i].iconVisual.SetActive(true);
         }
+
+        for (int i = 0; i < nonSpecialUIMarkers.Count; i++)
+        {
+            nonSpecialUIMarkers[i].gameObject.transform.localScale = Vector3.one * nonSpecialUIMarkers[i].minimapSize;
+        }
     }
 
     public void Maximize()
@@ -106,6 +123,11 @@ public class MiniMap : MonoBehaviour
         for (int i = 0; i < miniMapOnlyElements.Count; i++)
         {
             miniMapOnlyElements[i].iconVisual.SetActive(false);
+        }
+
+        for (int i = 0; i < nonSpecialUIMarkers.Count; i++)
+        {
+            nonSpecialUIMarkers[i].gameObject.transform.localScale = Vector3.one * nonSpecialUIMarkers[i].fullScreenSize;
         }
     }
 }

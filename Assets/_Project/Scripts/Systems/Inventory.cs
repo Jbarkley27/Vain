@@ -18,6 +18,7 @@ public class Inventory : MonoBehaviour
 
     // List of items in the inventory
     public Dictionary<Resource.ResourceType, int> resources = new Dictionary<Resource.ResourceType, int>();
+
     private void Awake()
     {
         if (Instance != null)
@@ -30,9 +31,14 @@ public class Inventory : MonoBehaviour
         DontDestroyOnLoad(gameObject);
     }
 
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
+        // Initialize the inventory with some default resources
+        Ions = 1000; // Starting Ions
+        Cores = 10; // Starting Cores
+        Upgrades = 5; // Starting Upgrades
         UpdateUI();
     }
 
@@ -42,8 +48,49 @@ public class Inventory : MonoBehaviour
 
     }
 
+    public void ReduceResource(Resource.ResourceType resourceType, int amount)
+    {
+        if (resourceType == Resource.ResourceType.ION)
+        {
+            Ions -= amount;
+        }
+        else if (resourceType == Resource.ResourceType.ORB)
+        {
+            Cores -= amount;
+        }
+        else if (resourceType == Resource.ResourceType.UPGRADE)
+        {
+            Upgrades -= amount;
+        }
+        else if (resources.ContainsKey(resourceType))
+        {
+            resources[resourceType] -= amount;
+            if (resources[resourceType] <= 0)
+            {
+                resources.Remove(resourceType);
+            }
+        }
+
+        UpdateUI();
+    }
+
     public int GetResourceAmount(Resource.ResourceType resourceType)
     {
+        if (resourceType == Resource.ResourceType.ION)
+        {
+            return Ions;
+        }
+
+        if (resourceType == Resource.ResourceType.ORB)
+        {
+            return Cores;
+        }
+
+        if (resourceType == Resource.ResourceType.UPGRADE)
+        {
+            return Upgrades;
+        }
+
         if (resources.ContainsKey(resourceType))
         {
             return resources[resourceType];

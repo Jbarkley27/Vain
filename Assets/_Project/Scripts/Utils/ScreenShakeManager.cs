@@ -45,6 +45,7 @@ public class ScreenShakeManager : MonoBehaviour
         }
         Instance = this;
         DontDestroyOnLoad(gameObject);
+        StopShake();
     }
 
     public void DoShake(ShakeProfile profile)
@@ -54,12 +55,28 @@ public class ScreenShakeManager : MonoBehaviour
 
     public IEnumerator Shake(ShakeProfile profile)
     {
-        cmFreeCam.GetComponentInChildren<CinemachineBasicMultiChannelPerlin>().AmplitudeGain = profile.amplitudeGain;
-        cmFreeCam.GetComponentInChildren<CinemachineBasicMultiChannelPerlin>().FrequencyGain = profile.frequencyGain;
+        CinemachineCamera cmVirtualCam = GlobalDataStore.Instance.CorrectCamera();
         
+        if (cmVirtualCam == null)
+        {
+            Debug.LogError("Cinemachine Virtual Camera not found.");
+            yield break;
+        }
+        
+        cmVirtualCam.GetComponentInChildren<CinemachineBasicMultiChannelPerlin>().AmplitudeGain = profile.amplitudeGain;
+        cmVirtualCam.GetComponentInChildren<CinemachineBasicMultiChannelPerlin>().FrequencyGain = profile.frequencyGain;
+
         yield return new WaitForSeconds(profile.shakeDuration);
 
-        cmFreeCam.GetComponentInChildren<CinemachineBasicMultiChannelPerlin>().AmplitudeGain = 0;
-        cmFreeCam.GetComponentInChildren<CinemachineBasicMultiChannelPerlin>().FrequencyGain = 0;
+        cmVirtualCam.GetComponentInChildren<CinemachineBasicMultiChannelPerlin>().AmplitudeGain = 0;
+        cmVirtualCam.GetComponentInChildren<CinemachineBasicMultiChannelPerlin>().FrequencyGain = 0;
+    }
+    
+    public void StopShake()
+    {
+        CinemachineCamera cmVirtualCam = GlobalDataStore.Instance.CorrectCamera();
+        
+        cmVirtualCam.GetComponentInChildren<CinemachineBasicMultiChannelPerlin>().AmplitudeGain = 0;
+        cmVirtualCam.GetComponentInChildren<CinemachineBasicMultiChannelPerlin>().FrequencyGain = 0;
     }
 }
