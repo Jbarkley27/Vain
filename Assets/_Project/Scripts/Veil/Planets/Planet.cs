@@ -8,6 +8,7 @@ public class Planet : MonoBehaviour
     [SerializeField] private PlanetZone _planetZone;
     [SerializeField] private GameObject zoneRoot;
     [SerializeField] private GameObject minimapMarker;
+    public Color PlanetColor;
 
     public void CreatePlanet(Vector3 planetPosition)
     {
@@ -22,7 +23,7 @@ public class Planet : MonoBehaviour
 
         zoneRoot.transform.position = new Vector3(planetPosition.x, 0, planetPosition.z);
         minimapMarker.transform.position = new Vector3(planetPosition.x, 0, planetPosition.z);
-        minimapMarker.transform.localScale = minimapMarker.transform.localScale * Random.Range(.6f, .9f);
+        // minimapMarker.transform.localScale = minimapMarker.transform.localScale * Random.Range(.6f, .9f);
 
         Debug.Log("Created " + Name);
     }

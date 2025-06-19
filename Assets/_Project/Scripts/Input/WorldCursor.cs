@@ -27,7 +27,6 @@ public class WorldCursor : MonoBehaviour
     void Update()
     {
         Cursor.visible = false;
-        if (ExtractionManager.Instance.IsExtracting()) return;
         CursorUI();
     }
 
@@ -68,7 +67,6 @@ public class WorldCursor : MonoBehaviour
 
     public void MovePhysicalCursor()
     {
-        if (ExtractionManager.Instance.IsExtracting()) return;
         if (Camera.main == null || _physicalWorldCursor == null)
         {
             Debug.LogWarning("Camera.main or physicalWorldCursor is null");

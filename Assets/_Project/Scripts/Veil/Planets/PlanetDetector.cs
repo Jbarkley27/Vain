@@ -5,6 +5,7 @@ public class PlanetDetector : MonoBehaviour
     public string CurrentPlanet;
     [SerializeField] private PlanetZoneUI _planetZoneUI;
     public Planet CurrentPlanetObject;
+    public StarfieldColorManager starfieldColorManager;
 
     private void OnTriggerEnter(Collider other)
     {
@@ -20,6 +21,15 @@ public class PlanetDetector : MonoBehaviour
             StartCoroutine(_planetZoneUI.EnterNewZone(CurrentPlanet));
             Debug.Log($"Player entered {planetZone.PlanetName}'s zone.");
         }
+
+
+        if (other.CompareTag("PlanetColorChange"))
+        {
+            PlanetColorZone planetZoneColorTheme = other.GetComponent<PlanetColorZone>();
+            if (planetZoneColorTheme == null) return;
+
+            starfieldColorManager.ChangeColor(planetZoneColorTheme.planetColor);
+        }
     }
 
     private void OnTriggerExit(Collider other)
@@ -32,6 +42,12 @@ public class PlanetDetector : MonoBehaviour
             CurrentPlanet = "Void";
             CurrentPlanetObject = null;
             Debug.Log($"Player exited {planetZone.PlanetName}'s zone.");
+        }
+
+
+        if (other.CompareTag("PlanetColorChange"))
+        {
+            starfieldColorManager.ChangeColor(starfieldColorManager.defaultVoidColor, true);
         }
     }
 

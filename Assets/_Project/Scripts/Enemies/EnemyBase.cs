@@ -35,6 +35,7 @@ public abstract class EnemyBase : MonoBehaviour, IPoolable
     public bool IsSetup = false;
     public EnemySpawner Spawner;
     public bool CanRotate = true;
+    public Planet planetOrigin;
 
 
     [Header("AI Settings")]
@@ -109,6 +110,8 @@ public abstract class EnemyBase : MonoBehaviour, IPoolable
     private void Update()
     {
         CanSeePlayer = CanEnemySeePlayer();
+
+        if (Spawner) planetOrigin = Spawner.planet;
     }
 
     protected virtual void FixedUpdate()
@@ -155,7 +158,7 @@ public abstract class EnemyBase : MonoBehaviour, IPoolable
 
 
         // Requirements to enter Wander state initially
-        _currentWanderNode = EnemyManager.Instance.GetRandomWanderNodePosition();
+        _currentWanderNode = Spawner.GetRandomWanderNodePosition();
         _agent.SetDestination(_currentWanderNode.transform.position);
         if (newScentCo == null) newScentCo = StartCoroutine(GetRandomScentNode());
 
@@ -240,7 +243,7 @@ public abstract class EnemyBase : MonoBehaviour, IPoolable
         // until the player is within its range.
         if (Vector3.Distance(transform.position, _agent.destination) <= _wanderNodeCloseRange)
         {
-            _currentWanderNode = EnemyManager.Instance.GetRandomWanderNodePosition();
+            _currentWanderNode = Spawner.GetRandomWanderNodePosition();
             _agent.SetDestination(_currentWanderNode.transform.position);
         }
 

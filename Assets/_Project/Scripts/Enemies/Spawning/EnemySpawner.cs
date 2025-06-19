@@ -18,6 +18,9 @@ public class EnemySpawner : MonoBehaviour
     private bool isPlayerInZone = false;
     private bool enemiesSpawned = false;
     public List<EnemyBase> activeEnemies = new List<EnemyBase>();
+    public PlanetDetector planetDetector;
+    public List<GameObject> PlanetWanderNodes;
+    public Transform enemyWanderNodeParent;
 
     void Awake()
     {
@@ -26,6 +29,18 @@ public class EnemySpawner : MonoBehaviour
             if (point == null) continue;
             spawnPoints.Add(point);
         }
+
+         PlanetWanderNodes.Clear();
+
+        foreach (Transform scentNode in enemyWanderNodeParent)
+        {
+            PlanetWanderNodes.Add(scentNode.gameObject);
+        }
+    }
+
+     public GameObject GetRandomWanderNodePosition()
+    {
+        return PlanetWanderNodes[Random.Range(0, PlanetWanderNodes.Count)];
     }
 
     private void OnTriggerEnter(Collider other)
@@ -99,6 +114,7 @@ public class EnemySpawner : MonoBehaviour
     void SpawnWave()
     {
         Debug.Log("Spawning enemies for " + planet.Name);
+        // Planet currentPlanetPlayerIsOn = planetDetector.CurrentPlanetObject;
         foreach (var entry in waveConfig.enemies)
         {
             for (int i = 0; i < entry.count; i++)

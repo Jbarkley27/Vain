@@ -1,21 +1,37 @@
 using System.Collections.Generic;
 using System.Linq;
+using Unity.VisualScripting;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
 public class PlanetManager : MonoBehaviour
 {
+    // Planet Formations
+    [System.Serializable]
+    public struct PlanetFormation
+    {
+        public Transform ParentPlacementParent;
+        public Transform SmallPOIListParent;
+        public Transform MediumPOIListParent;
+        public Transform LargePOIListParent;
+        public List<GameObject> planetFormation;
+        public List<GameObject> smallPOIList;
+        public List<GameObject> mediumPOIList;
+        public List<GameObject> largePOIList;
+    }
+
     public List<PlanetFormation> planetaryFormations = new List<PlanetFormation>();
     public List<Planet> planets = new List<Planet>();
-    public GameObject portalPrefab;
-    public List<GameObject> portalGameObjects = new List<GameObject>();
+    public Vector3 PlayerSpawnPosition = new Vector3(-2500, 0, -70);
 
-    public bool StartPlayerInVeil = true;
+
 
     void Start()
     {
         CreateVeil();
     }
+
+
 
     public void CreateVeil()
     {
@@ -23,28 +39,47 @@ public class PlanetManager : MonoBehaviour
 
         PlanetFormation newFormation = planetaryFormations[Random.Range(0, planetaryFormations.Count)];
 
+        // Get All Locations of POI from Selected Formation
+        foreach (Transform poi in newFormation.ParentPlacementParent)
+        {
+            newFormation.planetFormation.Add(poi.gameObject);
+        }
+
+        foreach (Transform poi in newFormation.SmallPOIListParent)
+        {
+            poi.AddComponent<POIState>();
+            newFormation.smallPOIList.Add(poi.gameObject);
+        }
+        
+        foreach (Transform poi in newFormation.MediumPOIListParent)
+        {
+            poi.AddComponent<POIState>();
+            newFormation.mediumPOIList.Add(poi.gameObject);
+        }
+
+        foreach (Transform poi in newFormation.LargePOIListParent)
+        {
+            poi.AddComponent<POIState>();
+            newFormation.largePOIList.Add(poi.gameObject);
+        }
+
+
+
+
         for (int i = 0; i < planets.Count; i++)
         {
-            planets[i].CreatePlanet(newFormation.formation[i]);
+            planets[i].CreatePlanet(newFormation.planetFormation[i].transform.position);
         }
 
         // copy the available event and landmark locations from the new formation
 
-        List<Vector3> eventLocations = newFormation.availableEventLocations.ToList();
-        List<Vector3> landmarkLocations = newFormation.availableLandmarkLocations.ToList();
+        // List<Vector3> landmarkLocations = newFormation.availableLandmarkLocations.ToList();
 
-        // spawn 2 portals
-        for (int i = 0; i < 2; i++)
-        {
-            Vector3 portalPosition = eventLocations[Random.Range(0, eventLocations.Count)];
-            GameObject portal = Instantiate(portalPrefab, portalPosition, Quaternion.identity);
-            eventLocations.Remove(portalPosition); // Remove the position to avoid duplicates
-            portalGameObjects.Add(portal);
-        }
+
+
+        // GlobalDataStore.Instance.Player.GetComponent<Rigidbody>().position = PlayerSpawnPosition;
 
         Debug.Log("Veil Creation Completed");
-
-        // HandleWherePlayerSpawns();
     }
 
 }

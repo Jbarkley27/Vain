@@ -12,8 +12,8 @@ public class MiniMap : MonoBehaviour
     public float _uiScaleFullscreen = 4;
     public float _scaleSpeed;
     public float _uiScaleMinimap = 1;
-    public float _camSizeMinimap = 88;
-    public float _camSizeFullscreen = 3000;
+    public float _camSizeMinimap = 100;
+    public float _camSizeFullscreen = 7000;
     public Camera minimapCam;
     public RectTransform maskUI;
     public GameObject playerMarker;

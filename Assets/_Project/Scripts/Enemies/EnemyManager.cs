@@ -6,10 +6,9 @@ public class EnemyManager : MonoBehaviour
 {
     public static EnemyManager Instance;
     public Transform playerScentNodeParent;
-    public Transform enemyWanderNodeParent;
+    // public Transform enemyWanderNodeParent;
     public List<ScentNode> PlayerScentNodes;
-    public List<GameObject> EnemyWanderNodes;
-    public List<GameObject> EnemyRepositionNodes;
+    // public List<GameObject> EnemyWanderNodes;
 
 
     private void Awake()
@@ -24,7 +23,7 @@ public class EnemyManager : MonoBehaviour
         DontDestroyOnLoad(gameObject);
 
         // Get all Nodes
-        EnemyWanderNodes.Clear();
+        // EnemyWanderNodes.Clear();
         PlayerScentNodes.Clear();
         foreach (Transform scentNode in playerScentNodeParent)
         {
@@ -32,10 +31,10 @@ public class EnemyManager : MonoBehaviour
             PlayerScentNodes.Add(scentNode.GetComponent<ScentNode>());
         }
 
-        foreach (Transform scentNode in enemyWanderNodeParent)
-        {
-            EnemyWanderNodes.Add(scentNode.gameObject);
-        }
+        // foreach (Transform scentNode in enemyWanderNodeParent)
+        // {
+        //     EnemyWanderNodes.Add(scentNode.gameObject);
+        // }
     }
 
     public float GetStatMultiplier()
@@ -43,10 +42,6 @@ public class EnemyManager : MonoBehaviour
         return 1f;
     }
 
-    public GameObject GetRandomWanderNodePosition()
-    {
-        return EnemyWanderNodes[Random.Range(0, EnemyWanderNodes.Count)];
-    }
 
     public Transform GetRandomPlayerScentNode(ScentNode usedNode = null)
     {
