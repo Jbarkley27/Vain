@@ -1,14 +1,13 @@
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
+using Random=UnityEngine.Random;
 
 public class EnemyManager : MonoBehaviour
 {
     public static EnemyManager Instance;
     public Transform playerScentNodeParent;
-    // public Transform enemyWanderNodeParent;
     public List<ScentNode> PlayerScentNodes;
-    // public List<GameObject> EnemyWanderNodes;
 
 
     private void Awake()
@@ -22,25 +21,22 @@ public class EnemyManager : MonoBehaviour
         Instance = this;
         DontDestroyOnLoad(gameObject);
 
-        // Get all Nodes
-        // EnemyWanderNodes.Clear();
         PlayerScentNodes.Clear();
         foreach (Transform scentNode in playerScentNodeParent)
         {
             scentNode.AddComponent<ScentNode>();
             PlayerScentNodes.Add(scentNode.GetComponent<ScentNode>());
         }
-
-        // foreach (Transform scentNode in enemyWanderNodeParent)
-        // {
-        //     EnemyWanderNodes.Add(scentNode.gameObject);
-        // }
     }
 
-    public float GetStatMultiplier()
+
+
+    public float GetEnemyTierStatMultiplier()
     {
         return 1f;
     }
+
+
 
 
     public Transform GetRandomPlayerScentNode(ScentNode usedNode = null)

@@ -1,6 +1,4 @@
 using UnityEngine;
-using System.Collections.Generic;
-using DG.Tweening;
 
 public class StarfieldColorManager : MonoBehaviour
 {
@@ -19,7 +17,7 @@ public class StarfieldColorManager : MonoBehaviour
 
     void Update()
     {
-        if (ColorToLerpTo == null) return;
+        if (ColorToLerpTo == null || Mathf.Approximately(GlobalDataStore.Instance.Player.GetComponent<Rigidbody>().linearVelocity.magnitude, 0f)) return;
         currentColor = Color.Lerp(currentColor, ColorToLerpTo, Time.deltaTime * lerpSpeed);
         cam.backgroundColor = currentColor;
     }

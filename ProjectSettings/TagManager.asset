@@ -11,6 +11,7 @@ TagManager:
   - PlayerIcon
   - Enemy
   - PlanetColorChange
+  - TargetUI
   layers:
   - Default
   - TransparentFX

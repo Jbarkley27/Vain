@@ -6,11 +6,9 @@ public class GlobalDataStore : MonoBehaviour
     public static GlobalDataStore Instance;
     public PlanetDetector PlanetDetector;
     public GameObject Player;
-    public GameObject DebugObject;
-    public InputManager InputManager;
-
     public CinemachineCamera VirtualCameraVeil;
-    public CinemachineCamera VirtualCameraBastion;
+    public RectTransform worldCursorUI;
+    public MiniMap MiniMap;
 
     private void Awake()
     {

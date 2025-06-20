@@ -1,7 +1,7 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
+using TMPro;
 
 public class MiniMap : MonoBehaviour
 {
@@ -17,8 +17,8 @@ public class MiniMap : MonoBehaviour
     public Camera minimapCam;
     public RectTransform maskUI;
     public GameObject playerMarker;
-    public List<MinimapIcon> fullScreenOnlyElements = new List<MinimapIcon>();
-    public List<MinimapIcon> miniMapOnlyElements = new List<MinimapIcon>();
+    public List<MiniMapKey> fullScreenOnlyElements = new List<MiniMapKey>();
+    public List<MiniMapKey> miniMapOnlyElements = new List<MiniMapKey>();
 
     public bool isFullscreen = false;
     public static bool IsFullscreen;
@@ -26,12 +26,28 @@ public class MiniMap : MonoBehaviour
     public GameObject mapKeyUIRoot;
     public CanvasGroup mapKeyCG;
 
-    public static List<MinimapIcon> nonSpecialUIMarkers = new List<MinimapIcon>();
-    public float smallMiniMapScale = 0.125f;
-    public float largeMiniMapScale = 4f;
+    public static List<MiniMapKey> miniMapKeys = new List<MiniMapKey>();
+    public static List<MinimapElement> minimapElements = new List<MinimapElement>();
+
+    [Header("Panel")]
+    public GameObject panel;
+    public CanvasGroup canvasCG;
+    public TMP_Text titleText;
+    public TMP_Text infoText;
+    public MiniMapKey.MinimapIconType currentIconTypeFiler;
+
+    [System.Serializable]
+    public struct PanelKeyData
+    {
+        public MiniMapKey.MinimapIconType keyType;
+        public string description;
+    }
+
+    public List<PanelKeyData> allKeyItems = new List<PanelKeyData>();
 
     private void Start()
     {
+        canvasCG.alpha = 1;
         Minimize();
     }
 
@@ -43,19 +59,37 @@ public class MiniMap : MonoBehaviour
         }
         else
         {
-             minimapCamera.transform.DOMove(fullScreenView.position, _scaleSpeed).SetEase(Ease.Linear);
+            minimapCamera.transform.DOMove(fullScreenView.position, _scaleSpeed).SetEase(Ease.Linear);
         }
 
         IsFullscreen = isFullscreen;
+
+        panel.SetActive(IsAnythingHovered());
+        FlashMapElements();
     }
 
-    public static void AddNonSpecialUIMarker(MinimapIcon marker)
+
+
+    public bool IsAnythingHovered()
     {
-        if (!nonSpecialUIMarkers.Contains(marker))
+        for (int i = 0; i < miniMapKeys.Count; i++)
         {
-            nonSpecialUIMarkers.Add(marker);
+            if (miniMapKeys[i].Hovered) return true;
+        }
+
+        return false;
+    }
+
+
+    public static void AddMiniMapKey(MiniMapKey marker)
+    {
+        if (!miniMapKeys.Contains(marker))
+        {
+            miniMapKeys.Add(marker);
         }
     }
+
+
 
     public void ToggleMinimapScale()
     {
@@ -74,6 +108,7 @@ public class MiniMap : MonoBehaviour
 
     public void Minimize()
     {
+        // HidePanel();
         mapKeyCG.DOFade(0, .1f).SetEase(Ease.InOutSine).OnComplete(() =>
         {
             mapKeyUIRoot.SetActive(false);
@@ -97,15 +132,12 @@ public class MiniMap : MonoBehaviour
             miniMapOnlyElements[i].iconVisual.SetActive(true);
         }
 
-        for (int i = 0; i < nonSpecialUIMarkers.Count; i++)
-        {
-            nonSpecialUIMarkers[i].gameObject.transform.localScale = Vector3.one * nonSpecialUIMarkers[i].minimapSize;
-        }
     }
 
     public void Maximize()
     {
         // maximizing
+        // HidePanel();
         maskUI.DOSizeDelta(new Vector2(_uiScaleFullscreen, _uiScaleFullscreen), _scaleSpeed).SetEase(Ease.InOutSine);
         mapBackground.DOSizeDelta(new Vector2(_uiScaleFullscreen + 10, _uiScaleFullscreen + 10), _scaleSpeed).SetEase(Ease.InOutSine);
         mapKeyUIRoot.SetActive(true);
@@ -125,9 +157,57 @@ public class MiniMap : MonoBehaviour
             miniMapOnlyElements[i].iconVisual.SetActive(false);
         }
 
-        for (int i = 0; i < nonSpecialUIMarkers.Count; i++)
+    }
+
+
+
+    public void FlashMapElements()
+    {
+        if (!IsAnythingHovered())
         {
-            nonSpecialUIMarkers[i].gameObject.transform.localScale = Vector3.one * nonSpecialUIMarkers[i].fullScreenSize;
+            Debug.Log("Nothing Hovered");
+            foreach (MinimapElement minimapElement in minimapElements)
+            {
+                minimapElement.canvasGroupFlasher.StopFlashing();
+            }
+            return;
         }
+        
+
+        foreach (MinimapElement minimapElement in minimapElements)
+        {
+            if (minimapElement.minimapIconType == currentIconTypeFiler)
+            {
+                minimapElement.canvasGroupFlasher.StartFlashing();
+            }
+            else
+            {
+                minimapElement.canvasGroupFlasher.StopFlashing();
+            }
+        }
+    }
+
+
+    public void UpdatePanelData(MiniMapKey.MinimapIconType keyType)
+    {
+        Debug.Log("Showing Panel");
+        currentIconTypeFiler = keyType;
+
+        PanelKeyData panelKeyData = allKeyItems.Find(item => item.keyType == keyType);
+
+        titleText.text = panelKeyData.keyType.ToString();
+        infoText.text = panelKeyData.description;
+    }
+
+    public void HidePanel()
+    {
+        Debug.Log("Hiding Panel");
+        foreach (MinimapElement minimapElement in minimapElements)
+        {
+            minimapElement.canvasGroupFlasher.StopFlashing();
+        }
+
+        titleText.text = "";
+        infoText.text = "";
     }
 }

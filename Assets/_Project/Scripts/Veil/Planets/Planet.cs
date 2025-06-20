@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using Random=UnityEngine.Random;
 
 public class Planet : MonoBehaviour
 {
@@ -8,16 +9,17 @@ public class Planet : MonoBehaviour
     [SerializeField] private PlanetZone _planetZone;
     [SerializeField] private GameObject zoneRoot;
     [SerializeField] private GameObject minimapMarker;
-    public Color PlanetColor;
 
     public void CreatePlanet(Vector3 planetPosition)
     {
+        // remove the debug planet object
         Destroy(transform.GetChild(0).gameObject);
 
         int randomPlanetForm = Random.Range(0, _planetForms.Count);
 
         PlanetForm planetFormPrefab = Instantiate(_planetForms[randomPlanetForm], planetPosition, Quaternion.identity, transform);
 
+        // setup planet
         planetFormPrefab.name = Name;
         _planetZone.SetPlanetName(Name, this);
 
