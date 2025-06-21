@@ -22,6 +22,11 @@ public class EnemySpawner : MonoBehaviour
     public List<GameObject> PlanetWanderNodes;
     public Transform enemyWanderNodeParent;
 
+
+    [Header("Debug")]
+    public WaveConfig testWaveConfig;
+    public bool DebugMode = false;
+
     void Awake()
     {
         foreach (Transform point in spawnParent)
@@ -38,7 +43,15 @@ public class EnemySpawner : MonoBehaviour
         }
     }
 
-     public GameObject GetRandomWanderNodePosition()
+    void Start()
+    {
+        if (DebugMode)
+        {
+            SpawnTestSubjects();
+        }
+    }
+
+    public GameObject GetRandomWanderNodePosition()
     {
         return PlanetWanderNodes[Random.Range(0, PlanetWanderNodes.Count)];
     }
@@ -109,6 +122,24 @@ public class EnemySpawner : MonoBehaviour
         DespawnWave();
         enemiesSpawned = false;
         despawnCoroutine = null;
+    }
+
+    public void SpawnTestSubjects()
+    {
+        Debug.Log("Spawning enemies for " + planet.Name);
+        // Planet currentPlanetPlayerIsOn = planetDetector.CurrentPlanetObject;
+        foreach (var entry in testWaveConfig.enemies)
+        {
+            for (int i = 0; i < entry.count; i++)
+            {
+                Vector3 spawnPos = EnemyManager.Instance.PlayerScentNodes[Random.Range(0, EnemyManager.Instance.PlayerScentNodes.Count)].gameObject.transform.position;
+
+                GameObject enemyObj = pooler.Spawn(entry.enemyID, spawnPos, Quaternion.identity);
+                EnemyBase enemy = enemyObj.GetComponent<EnemyBase>();
+                if (!enemy.IsSetup) enemy.Setup(entry.tier, player, this, true);
+                activeEnemies.Add(enemy);
+            }
+        }
     }
 
     void SpawnWave()

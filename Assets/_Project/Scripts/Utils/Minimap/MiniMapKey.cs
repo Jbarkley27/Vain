@@ -1,4 +1,3 @@
-using Microsoft.Unity.VisualStudio.Editor;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -9,7 +8,7 @@ public class MiniMapKey : MonoBehaviour
     public bool Hovered;
     public Color normalColor;
     public Color highlightedColor;
-    public UnityEngine.UI.Image backgroundColor;
+    public Image backgroundColor;
 
     public enum MinimapIconType {PLANET, PLAYER, ENEMY_BASIC, ENEMY_ELITE, ENEMY_BOSS, POI, CHEST, HEALTH, LOOT, PORTAL};
     public MinimapIconType minimapIconType;
@@ -22,7 +21,7 @@ public class MiniMapKey : MonoBehaviour
     void Start()
     {
         thisRect = GetComponent<RectTransform>();
-        backgroundColor = GetComponent<UnityEngine.UI.Image>();
+        backgroundColor = GetComponent<Image>();
         MiniMap.AddMiniMapKey(this);
     }
 

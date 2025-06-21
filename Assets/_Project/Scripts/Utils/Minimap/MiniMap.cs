@@ -17,8 +17,11 @@ public class MiniMap : MonoBehaviour
     public Camera minimapCam;
     public RectTransform maskUI;
     public GameObject playerMarker;
-    public List<MiniMapKey> fullScreenOnlyElements = new List<MiniMapKey>();
-    public List<MiniMapKey> miniMapOnlyElements = new List<MiniMapKey>();
+    public List<GameObject> fullScreenOnlyElements = new List<GameObject>();
+    public List<GameObject> miniMapOnlyElements = new List<GameObject>();
+    public enum MiniMapState {MINI, MAX};
+    public MiniMapState miniMapState;
+    public PlayerInfoUI playerInfoUI;
 
     public bool isFullscreen = false;
     public static bool IsFullscreen;
@@ -35,6 +38,7 @@ public class MiniMap : MonoBehaviour
     public TMP_Text titleText;
     public TMP_Text infoText;
     public MiniMapKey.MinimapIconType currentIconTypeFiler;
+    public bool CanShowPanel = true;
 
     [System.Serializable]
     public struct PanelKeyData
@@ -64,7 +68,8 @@ public class MiniMap : MonoBehaviour
 
         IsFullscreen = isFullscreen;
 
-        panel.SetActive(IsAnythingHovered());
+        if (playerInfoUI.IsOpen) return;
+        panel.SetActive(IsAnythingHovered() && CanShowPanel && IsFullscreen);
         FlashMapElements();
     }
 
@@ -81,6 +86,15 @@ public class MiniMap : MonoBehaviour
     }
 
 
+    public void ForceClosePanel()
+    {
+        for (int i = 0; i < miniMapKeys.Count; i++)
+        {
+            miniMapKeys[i].Hovered = false;
+        }
+    }
+
+
     public static void AddMiniMapKey(MiniMapKey marker)
     {
         if (!miniMapKeys.Contains(marker))
@@ -93,6 +107,7 @@ public class MiniMap : MonoBehaviour
 
     public void ToggleMinimapScale()
     {
+        if (playerInfoUI.IsOpen) return;
         if (isFullscreen)
         {
             Minimize();
@@ -108,7 +123,8 @@ public class MiniMap : MonoBehaviour
 
     public void Minimize()
     {
-        // HidePanel();
+        if (miniMapState == MiniMapState.MINI) return;
+        CanShowPanel = false;
         mapKeyCG.DOFade(0, .1f).SetEase(Ease.InOutSine).OnComplete(() =>
         {
             mapKeyUIRoot.SetActive(false);
@@ -124,20 +140,22 @@ public class MiniMap : MonoBehaviour
 
         for (int i = 0; i < fullScreenOnlyElements.Count; i++)
         {
-            fullScreenOnlyElements[i].iconVisual.SetActive(false);
+            fullScreenOnlyElements[i].SetActive(false);
         }
 
         for (int i = 0; i < miniMapOnlyElements.Count; i++)
         {
-            miniMapOnlyElements[i].iconVisual.SetActive(true);
+            miniMapOnlyElements[i].SetActive(true);
         }
 
+        miniMapState = MiniMapState.MINI;
     }
 
     public void Maximize()
     {
         // maximizing
-        // HidePanel();
+        if (miniMapState == MiniMapState.MAX || playerInfoUI.IsOpen) return;
+        CanShowPanel = true;
         maskUI.DOSizeDelta(new Vector2(_uiScaleFullscreen, _uiScaleFullscreen), _scaleSpeed).SetEase(Ease.InOutSine);
         mapBackground.DOSizeDelta(new Vector2(_uiScaleFullscreen + 10, _uiScaleFullscreen + 10), _scaleSpeed).SetEase(Ease.InOutSine);
         mapKeyUIRoot.SetActive(true);
@@ -149,14 +167,15 @@ public class MiniMap : MonoBehaviour
 
         for (int i = 0; i < fullScreenOnlyElements.Count; i++)
         {
-            fullScreenOnlyElements[i].iconVisual.SetActive(true);
+            fullScreenOnlyElements[i].SetActive(true);
         }
 
         for (int i = 0; i < miniMapOnlyElements.Count; i++)
         {
-            miniMapOnlyElements[i].iconVisual.SetActive(false);
+            miniMapOnlyElements[i].SetActive(false);
         }
 
+        miniMapState = MiniMapState.MAX;
     }
 
 
@@ -165,7 +184,6 @@ public class MiniMap : MonoBehaviour
     {
         if (!IsAnythingHovered())
         {
-            Debug.Log("Nothing Hovered");
             foreach (MinimapElement minimapElement in minimapElements)
             {
                 minimapElement.canvasGroupFlasher.StopFlashing();
@@ -202,10 +220,13 @@ public class MiniMap : MonoBehaviour
     public void HidePanel()
     {
         Debug.Log("Hiding Panel");
+        ForceClosePanel();
         foreach (MinimapElement minimapElement in minimapElements)
         {
             minimapElement.canvasGroupFlasher.StopFlashing();
         }
+
+        panel.SetActive(false);
 
         titleText.text = "";
         infoText.text = "";

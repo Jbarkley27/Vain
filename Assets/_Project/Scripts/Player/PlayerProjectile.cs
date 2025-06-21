@@ -31,8 +31,14 @@ public class PlayerProjectile : ProjectileBase
                 return;
             }
 
-            enemy.TakeDamage(damage);
+
+            enemy.TakeDamage(damage + StatManager.Instance.GetElementDamageValue(elementType), statusEffectType, 100);
             Destroy(gameObject);
+            // }
         }
-    }
+        // else
+            // {
+            //     Destroy(gameObject);
+            // }
+        }
 }

@@ -177,7 +177,7 @@ MonoBehaviour:
     x: 398
     y: -542
     width: 756
-    height: 1646
+    height: 1645
 --- !u!114 &114350483966674976
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -234,7 +234,7 @@ MonoBehaviour:
   - {fileID: 114780028408030698}
   - {fileID: 114063133802684794}
   dataType: 0
-  capacity: 900000
+  capacity: 1500000
   stripCapacity: 16
   particlePerStripCount: 16
   needsComputeBounds: 1
@@ -571,7 +571,7 @@ MonoBehaviour:
       m_Type:
         m_SerializableType: UnityEngine.Vector2, UnityEngine.CoreModule, Version=0.0.0.0,
           Culture=neutral, PublicKeyToken=null
-      m_SerializableObject: '{"x":70000.0,"y":90000.0}'
+      m_SerializableObject: '{"x":80000.0,"y":90000.0}'
     m_Space: -1
   m_Property:
     name: Rate
@@ -1480,7 +1480,7 @@ MonoBehaviour:
       m_Type:
         m_SerializableType: UnityEngine.Vector3, UnityEngine.CoreModule, Version=0.0.0.0,
           Culture=neutral, PublicKeyToken=null
-      m_SerializableObject: '{"x":16.948381423950197,"y":16.948381423950197,"z":16.948381423950197}'
+      m_SerializableObject: '{"x":16.948379516601564,"y":16.948379516601564,"z":16.948379516601564}'
     m_Space: -1
   m_Property:
     name: _Color

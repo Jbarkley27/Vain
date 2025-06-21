@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
+using Random=UnityEngine.Random;
 
 [RequireComponent(typeof(Collider), typeof(Rigidbody))]
 public class Resource : MonoBehaviour
@@ -32,7 +33,7 @@ public class Resource : MonoBehaviour
         if (other.CompareTag("Player"))
         {
             // Assuming Player has a method to collect resources
-            Inventory.Instance.AddResource(resourceType, amount);
+            Inventory.Instance.AddResourceToInventory(resourceType, amount);
 
             gameObject.transform.DOScale(Vector3.zero, 0.2f)
             .SetEase(Ease.InBack)

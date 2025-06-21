@@ -5,18 +5,41 @@ using UnityEngine;
 public class Inventory : MonoBehaviour
 {
     // Currency
-    public int Ions;
-    public int Cores;
-    public int Upgrades;
+    // public int Ions;
+    // public int Cores;
+    // public int Upgrades;
     public static Inventory Instance;
 
-    [Header("UI")]
-    public TMP_Text ionText;
-    public TMP_Text coreText;
-    public TMP_Text upgradeText;
+    // [Header("UI")]
+    // public TMP_Text ionText;
+    // public TMP_Text coreText;
+    // public TMP_Text upgradeText;
+
+    [System.Serializable]
+    public struct InventoryItem
+    {
+        public Resource.ResourceType resourceType;
+        public string Name;
+        // public TMP_Text NameText;
+        public TMP_Text AmountText;
+        public int Amount;
+
+        public void UpdateItemAmount(int amount)
+        {
+            Amount += amount;
+            AmountText.text = Amount + "";
+        }
+
+        public void InitiateStatUI()
+        {
+            // NameText.text = Name;
+            Amount = 0;
+            UpdateItemAmount(0);
+        }
+    }
 
     // List of items in the inventory
-    public Dictionary<Resource.ResourceType, int> resources = new Dictionary<Resource.ResourceType, int>();
+    public List<InventoryItem> InventoryList = new List<InventoryItem>();
 
     private void Awake()
     {
@@ -34,11 +57,10 @@ public class Inventory : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        // Initialize the inventory with some default resources
-        Ions = 1000; // Starting Ions
-        Cores = 10; // Starting Cores
-        Upgrades = 5; // Starting Upgrades
-        UpdateUI();
+        foreach (InventoryItem item in InventoryList)
+        {
+            item.InitiateStatUI();
+        }
     }
 
     // Update is called once per frame
@@ -47,111 +69,32 @@ public class Inventory : MonoBehaviour
 
     }
 
-    public void ReduceResource(Resource.ResourceType resourceType, int amount)
+
+    public int GetItemAmount(Resource.ResourceType type)
     {
-        if (resourceType == Resource.ResourceType.ION)
+        foreach (InventoryItem item in InventoryList)
         {
-            Ions -= amount;
-        }
-        else if (resourceType == Resource.ResourceType.ORB)
-        {
-            Cores -= amount;
-        }
-        else if (resourceType == Resource.ResourceType.UPGRADE)
-        {
-            Upgrades -= amount;
-        }
-        else if (resources.ContainsKey(resourceType))
-        {
-            resources[resourceType] -= amount;
-            if (resources[resourceType] <= 0)
+            if (item.resourceType == type)
             {
-                resources.Remove(resourceType);
+                return item.Amount;
             }
         }
 
-        UpdateUI();
+        Debug.Log("No item was found");
+        return 0;
     }
 
-    public int GetResourceAmount(Resource.ResourceType resourceType)
+    public void AddResourceToInventory(Resource.ResourceType type, int amount)
     {
-        if (resourceType == Resource.ResourceType.ION)
+        foreach (InventoryItem item in InventoryList)
         {
-            return Ions;
-        }
-
-        if (resourceType == Resource.ResourceType.ORB)
-        {
-            return Cores;
-        }
-
-        if (resourceType == Resource.ResourceType.UPGRADE)
-        {
-            return Upgrades;
-        }
-
-        if (resources.ContainsKey(resourceType))
-        {
-            return resources[resourceType];
-        }
-        return 0; // Return 0 if the resource type does not exist
-    }
-
-    public void AddResource(Resource.ResourceType resourceType, int amount)
-    {
-        if (resources.ContainsKey(resourceType))
-        {
-            resources[resourceType] += amount;
-        }
-        else
-        {
-            resources[resourceType] = amount;
-        }
-
-        UpdateUI();
-    }
-
-    public void RemoveResource(Resource.ResourceType resourceType, int amount)
-    {
-        if (resources.ContainsKey(resourceType))
-        {
-            resources[resourceType] -= amount;
-            if (resources[resourceType] <= 0)
+            if (item.resourceType == type)
             {
-                resources.Remove(resourceType);
+                item.UpdateItemAmount(amount);
+                return;
             }
         }
-        else
-        {
-            Debug.LogWarning($"Attempted to remove {amount} of {resourceType}, but it does not exist in the inventory.");
-        }
 
-        UpdateUI();
+        Debug.Log("No item was found");
     }
-    
-
-    public void UpdateUI()
-    {
-        ionText.text = Ions.ToString();
-        coreText.text = Cores.ToString();
-        upgradeText.text = Upgrades.ToString();
-
-        // Update resource amounts in the UI
-        foreach (var resource in resources)
-        {
-            switch (resource.Key)
-            {
-                case Resource.ResourceType.ION:
-                    ionText.text = resource.Value.ToString();
-                    break;
-                case Resource.ResourceType.ORB:
-                    coreText.text = resource.Value.ToString();
-                    break;
-                case Resource.ResourceType.UPGRADE:
-                    upgradeText.text = resource.Value.ToString();
-                    break;
-            }
-        }
-    }
-
 }

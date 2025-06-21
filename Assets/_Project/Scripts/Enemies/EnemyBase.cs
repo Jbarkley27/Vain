@@ -36,6 +36,7 @@ public abstract class EnemyBase : MonoBehaviour, IPoolable
     public EnemySpawner Spawner;
     public bool CanRotate = true;
     public Planet planetOrigin;
+    public StatusEffectEnemyManager statusEffectEnemyManager;
 
 
     [Header("AI Settings")]
@@ -109,6 +110,7 @@ public abstract class EnemyBase : MonoBehaviour, IPoolable
 
     private void Update()
     {
+        if (!IsSetup) return;
         CanSeePlayer = CanEnemySeePlayer();
 
         if (Spawner) planetOrigin = Spawner.planet;
@@ -116,6 +118,7 @@ public abstract class EnemyBase : MonoBehaviour, IPoolable
 
     protected virtual void FixedUpdate()
     {
+        if (!IsSetup) return;
         HandleState();
     }
 
@@ -126,10 +129,19 @@ public abstract class EnemyBase : MonoBehaviour, IPoolable
 
     // Pooling | Instantiate Logic ------------------------------------------------------------------------
 
-    public virtual void Setup(int worldTier, Transform playerTarget, EnemySpawner spawner)
-
+    public virtual void Setup(int worldTier, Transform playerTarget, EnemySpawner spawner, bool DebugMode = false)
     {
         if (IsSetup) return;
+
+        if (DebugMode)
+        {
+            Spawner = spawner;
+            // Setup Health
+            CurrentHealth = MaxHealth;
+            // Setup UI
+            CreateHealthUI();
+            return;
+        }
 
         // randomize some of the agent properties so there is some variation in the enemy movement
         _agent.speed = Random.Range(minSpeed, maxSpeed);
@@ -187,7 +199,7 @@ public abstract class EnemyBase : MonoBehaviour, IPoolable
         _currentState = EnemyState.Wander;
         if (healthUI) healthUI.gameObject.SetActive(false);
     }
-    
+
 
     void CreateHealthUI()
     {
@@ -198,12 +210,15 @@ public abstract class EnemyBase : MonoBehaviour, IPoolable
 
         healthUI = uiInstance.GetComponent<EnemyHealthUI>();
         healthUI.SetTarget(this); // `this` = enemy
+
+        // connect the status effect system with the healthUI
+        statusEffectEnemyManager.statusEffectRoot = healthUI.statusEffectRoot;
     }
 
 
-    public void TakeDamage(int damage)
+    public void TakeDamage(int damage, StatusEffectBase.StatusEffectType statusEffectType = StatusEffectBase.StatusEffectType.NONE, int statusApplicationChance = 0)
     {
-        Debug.Log("enemy taking dage");
+        Debug.Log("enemy taking damage | Status Effect: " + statusEffectType.ToString());
         CurrentHealth = Mathf.Clamp(CurrentHealth - damage, 0, MaxHealth);
         healthUI.UpdateHealthText();
 
@@ -211,6 +226,17 @@ public abstract class EnemyBase : MonoBehaviour, IPoolable
         {
             InitiateDeath();
         }
+
+        // if not dead, check if a status effect chance was passed
+        if (statusEffectType == StatusEffectBase.StatusEffectType.NONE) return;
+
+        // we know there is a passed status effect chance event
+        if (Random.Range(0, 100) < statusApplicationChance)
+        {
+            Debug.Log("Adding Status to enemy");
+            statusEffectEnemyManager.AddStatus(statusEffectType, StatusEffectPlayerManager.Instance.GetStatusPrefab(statusEffectType));
+        }
+
     }
 
 

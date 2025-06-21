@@ -9,6 +9,7 @@ public class GlobalDataStore : MonoBehaviour
     public CinemachineCamera VirtualCameraVeil;
     public RectTransform worldCursorUI;
     public MiniMap MiniMap;
+    public PlayerMovement PlayerMovement;
 
     private void Awake()
     {

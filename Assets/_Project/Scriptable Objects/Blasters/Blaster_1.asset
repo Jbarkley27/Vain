@@ -18,7 +18,7 @@ MonoBehaviour:
   FireRate: 0.15
   MaxAmmo: 100
   CooldownRate: 0
-  BaseDamage: 5
+  BaseDamage: 1
   RegenRate: 0.1
   CurrentAmmo: 100
   ProjectilePrefab: {fileID: 8010873185767639128, guid: eb84250b586134b8cbd44a0c16b539db, type: 3}

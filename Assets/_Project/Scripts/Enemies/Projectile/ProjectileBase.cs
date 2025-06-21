@@ -10,6 +10,8 @@ public class ProjectileBase : MonoBehaviour
     public float lifetime;
     public float timeAlive;
     public int damage;
+    public WeaponTypes.ElementType elementType;
+    public StatusEffectBase.StatusEffectType statusEffectType;
 
     public void Initialize(Vector3 direction, float speed, AnimationCurve curve, float life, int damage)
     {
