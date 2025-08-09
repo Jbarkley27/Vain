@@ -9,11 +9,9 @@ public abstract class Skill : ItemObject
     public float rechargeTime;
     public float baseDamage;
     public float baseCooldownRate;
-    public Sprite skillIcon;
     public WeaponTypes.ElementType elementType;
-    // public ItemDatabase.SkillIds skillId;
 
-    public abstract void Execute();
+    public abstract void Execute(MonoBehaviour monoBehaviour);
 
 
     public override ItemObject GetItem() { return this; }

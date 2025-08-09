@@ -24,6 +24,7 @@ public class Blaster : ItemObject
     public AnimationCurve animationCurve;
     public Sprite BlasterIcon;
     public ScreenShakeManager.ShakeProfile ScreenShakeProfile;
+    public float knockbackForce = 400;
 
 
     private void Start()

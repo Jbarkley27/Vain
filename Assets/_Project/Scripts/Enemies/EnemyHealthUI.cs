@@ -11,6 +11,7 @@ public class EnemyHealthUI : MonoBehaviour
     public Slider _healthSlider;
     public TMP_Text healthText;
     public float _healthSliderSpeed;
+    public GameObject statusEffectRoot;
 
     void Start()
     {

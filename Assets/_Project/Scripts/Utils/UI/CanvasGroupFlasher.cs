@@ -11,22 +11,24 @@ public class CanvasGroupFlasher : MonoBehaviour
 
     private CanvasGroup canvasGroup;
     private Tween flashTween;
+    public bool IsFlashing;
 
     void Awake()
     {
         canvasGroup = GetComponent<CanvasGroup>();
-        StartFlashing();
+        // StartFlashing();
     }
 
     void OnEnable()
     {
-        StartFlashing();
+        // StartFlashing();
     }
 
     public void StartFlashing()
     {
+        if (IsFlashing) return;
         StopFlashing(); // ensure no duplicates
-
+        IsFlashing = true;
         flashTween = canvasGroup.DOFade(alphaMin, flashSpeed)
             .SetLoops(-1, LoopType.Yoyo)
             .SetEase(Ease.InOutSine);
@@ -34,10 +36,12 @@ public class CanvasGroupFlasher : MonoBehaviour
 
     public void StopFlashing()
     {
+        if (!IsFlashing) return;
         if (flashTween != null && flashTween.IsActive())
         {
             flashTween.Kill();
             canvasGroup.alpha = alphaMax; // reset alpha
+            IsFlashing = false;
         }
     }
 

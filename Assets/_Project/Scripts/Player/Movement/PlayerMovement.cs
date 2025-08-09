@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
+using UnityEngine.VFX;
 
 
 
@@ -9,7 +11,6 @@ public class PlayerMovement : MonoBehaviour
 
     [Header("General")]
     [SerializeField] private Rigidbody _rb;
-    [SerializeField] private float _maxVelocity;
     private InputManager _inputManager;
 
 
@@ -19,39 +20,46 @@ public class PlayerMovement : MonoBehaviour
     private float _rotateDifference;
 
 
+
     [Header("Boost")]
-    [SerializeField] private float _boostForce;
+    public BoostUI boostUI;
+    public float boostAddition = 60f;
 
 
     [Header("Dash Settings")]
     public bool CanDash = true;
 
     // How tight the dash feels, adds resistance. Lower values makes it feel floaty
-    [SerializeField] float _dashDrag; 
+    [SerializeField] float _dashDrag;
     private float _defaultDrag;
+
+
 
     // How fast the dashDrag goes back to defaultDrag. Higher values makes the change of drags more noticeable.
     // Should keep this low ( current sweet spot = .1f)
     [SerializeField] float _resetMomentumTime;
     [SerializeField] float _dashForce;
     public bool IsDashing = false;
-
     // Controls the burst duration. Higher values will make the dash longer.
     [SerializeField] float _dashForHowLong;
-    [SerializeField] private float _dashCooldown;
-    // private List<MeshRenderer> meshesToHideWhenDashing = new List<MeshRenderer>();
-    // public GameObject playerMesh;
+    private List<MeshRenderer> meshesToHideWhenDashing = new List<MeshRenderer>();
+    public GameObject playerMesh;
+    public DashSkillUI dashSkillUI;
+
 
 
     [Header("Thrust Settings")]
-    [SerializeField] private float _forceMagnitude = 5.55f;
     [SerializeField] private float _xForce;
     [SerializeField] private float _yForce;
+
 
 
     [Header("Animation")]
     [SerializeField] private Animator _animator;
     [SerializeField] private float _dampTime;
+
+    [Header("VFX")]
+    public VisualEffect speedLines;
 
 
 
@@ -60,18 +68,19 @@ public class PlayerMovement : MonoBehaviour
         _rb = GetComponent<Rigidbody>();
         _inputManager = GetComponent<InputManager>();
         _defaultDrag = _rb.linearDamping;
-        _boostForce = 250f;
+        meshesToHideWhenDashing = playerMesh.transform.GetComponentsInChildren<MeshRenderer>().ToList();
     }
+
 
     void Update()
     {
         HandleAnimations();
+        HandleSpeedVFX();
     }
+
 
     private void FixedUpdate()
     {
-        // ensure player y position is always 0
-        // transform.position = new Vector3(transform.position.x, 0, transform.position.z);
         RotateTowards(WorldCursor.instance.GetDirectionFromWorldCursor(transform.position));
         Thrust();
         Boost();
@@ -85,7 +94,6 @@ public class PlayerMovement : MonoBehaviour
         if (targetDirection == Vector3.zero)
             return;
 
-        // Debug.Log("Rotating");
         // Calculate the target rotation
         Quaternion targetRotation = Quaternion.LookRotation(targetDirection);
 
@@ -114,6 +122,11 @@ public class PlayerMovement : MonoBehaviour
         _rb.MoveRotation(smoothedRotation);
     }
 
+
+
+
+
+
     // THRUST HANDLING ------------------------------------------------------
     private void Thrust()
     {
@@ -133,32 +146,46 @@ public class PlayerMovement : MonoBehaviour
         camForward.Normalize();
         camRight.Normalize();
 
-        Vector3 movementDirectionX = camRight * xThrustInput * _xForce * _forceMagnitude;
-        Vector3 movementDirectionY = camForward * yThrustInput * _yForce * _forceMagnitude;
+        Vector3 movementDirectionX = camRight * xThrustInput * _xForce * StatManager.Instance.GetThrustValue();
+        Vector3 movementDirectionY = camForward * yThrustInput * _yForce * StatManager.Instance.GetThrustValue();
 
         _rb.AddForce(movementDirectionX, ForceMode.Force);
         _rb.AddForce(movementDirectionY, ForceMode.Force);
     }
 
 
+
+
     // BOOST HANDLING ------------------------------------------------------
     private void Boost()
     {
         if (!_inputManager.IsBoosting) return;
-
-        _rb.AddForce(gameObject.transform.forward * _boostForce, ForceMode.Impulse);
+        _rb.AddForce(gameObject.transform.forward * (StatManager.Instance.GetBoostValue() + (boostUI.EnoughEnergyToBoost() ? boostAddition : 0f)), ForceMode.Impulse);
     }
 
 
 
 
-    public IEnumerator Dash()
+
+
+    // DASH HANDLING ---------------------------------------------------------
+
+    public void StartDash(float dashCooldown)
     {
+        if (!CanDash || IsDashing) return;
 
-        if (!CanDash || IsDashing) yield return null;
+        if (_inputManager.ThrustInput.magnitude == 0) return;
 
-        if (_inputManager.ThrustInput.magnitude == 0) yield return null;
+        // Disable further dashes during cooldown
+        CanDash = false;
+        IsDashing = true;
 
+        StartCoroutine(Dash(dashCooldown));
+    }
+
+
+    public IEnumerator Dash(float dashCooldown)
+    {
         float xThrustInput = _inputManager.ThrustInput.x;
         float yThrustInput = _inputManager.ThrustInput.y;
 
@@ -178,21 +205,13 @@ public class PlayerMovement : MonoBehaviour
 
         Debug.Log("Dashing");
 
-        // Disable further dashes during cooldown
-        CanDash = false;
-        IsDashing = true;
-
-        // Apply a force in the direction of thrust input
-        var finalDir = new Vector3(movementDirectionX.x, 0, movementDirectionY.y);
-
-
-        // _rb.AddForce(finalDir * _dashForce, ForceMode.VelocityChange);
         _rb.AddForce(movementDirectionX * _dashForce, ForceMode.VelocityChange);
         _rb.AddForce(movementDirectionY * _dashForce, ForceMode.VelocityChange);
-
+        StartCoroutine(
+                dashSkillUI.UseSkill());
 
         // Hide Player while dashing
-        // foreach (MeshRenderer mr in meshesToHideWhenDashing) mr.enabled = false;
+        foreach (MeshRenderer mr in meshesToHideWhenDashing) mr.enabled = false;
 
 
         // Wait for the dash time
@@ -205,16 +224,16 @@ public class PlayerMovement : MonoBehaviour
         yield return new WaitForSeconds(_resetMomentumTime);
 
         // Unhide Player
-        // foreach (MeshRenderer mr in meshesToHideWhenDashing) mr.enabled = true;
+        foreach (MeshRenderer mr in meshesToHideWhenDashing) mr.enabled = true;
 
         _rb.linearDamping = _defaultDrag;
         IsDashing = false;
-
-        yield return new WaitForSeconds(_dashCooldown);
-
-        CanDash = true;
     }
-    
+
+
+
+
+
     // ANIMATION HANDLING ---------------------------------------------------
     public void HandleAnimations()
     {
@@ -233,6 +252,10 @@ public class PlayerMovement : MonoBehaviour
         _animator.SetFloat("RotateDifference", scaledRoll, _dampTime, Time.deltaTime);
     }
 
+
+
+
+
     public float ScaleValue(float value)
     {
         float min = -45f;
@@ -243,5 +266,20 @@ public class PlayerMovement : MonoBehaviour
 
         // Scale the value to the range -1 to 1
         return value / max; // Equivalent to (value - min) / (max - min) * 2 - 1
+    }
+
+
+
+    // VFX -----------------------------------------------------------------------
+    public void HandleSpeedVFX()
+    {
+        if (!_inputManager.IsBoosting)
+        {
+            speedLines.gameObject.SetActive(false);
+            return;
+        }
+
+        speedLines.gameObject.SetActive(true);
+        speedLines.SetBool("IsBoosting", boostUI.EnoughEnergyToBoost());
     }
 }

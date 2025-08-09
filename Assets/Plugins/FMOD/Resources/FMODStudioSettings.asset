@@ -682,8 +682,8 @@ MonoBehaviour:
   switchSettingsMigration: 1
   HasSourceProject: 1
   HasPlatforms: 1
-  sourceProjectPath: ../Vain_Audio/Vain_Audio.fspro
-  sourceBankPath: ../Vain_Audio/Build
+  sourceProjectPath: ../Amythest_Audio/Amythest_Audio.fspro
+  sourceBankPath: ../Amythest_Audio/Build
   sourceBankPathUnformatted: 
   BankRefreshCooldown: 5
   ShowBankRefreshWindow: 1
@@ -706,7 +706,9 @@ MonoBehaviour:
   Plugins: []
   MasterBanks:
   - Master
-  Banks: []
+  Banks:
+  - Music
+  - UI
   BanksToLoad: []
   LiveUpdatePort: 9264
   EnableMemoryTracking: 0
@@ -718,7 +720,7 @@ MonoBehaviour:
   EnableErrorCallback: 0
   SharedLibraryUpdateStage: 0
   SharedLibraryTimeSinceStart: 0
-  CurrentVersion: 131624
+  CurrentVersion: 131625
   HideSetupWizard: 1
   LastEventReferenceScanVersion: 131624
   Platforms:

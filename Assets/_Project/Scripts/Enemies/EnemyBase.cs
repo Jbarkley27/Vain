@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using DG.Tweening;
 using UnityEngine;
 using UnityEngine.AI;
 using Random=UnityEngine.Random;
@@ -35,6 +36,10 @@ public abstract class EnemyBase : MonoBehaviour, IPoolable
     public bool IsSetup = false;
     public EnemySpawner Spawner;
     public bool CanRotate = true;
+    public Planet planetOrigin;
+    public StatusEffectEnemyManager statusEffectEnemyManager;
+    public MeshFlashEffect meshFlashEffect;
+    public GameObject visual;
 
 
     [Header("AI Settings")]
@@ -108,11 +113,15 @@ public abstract class EnemyBase : MonoBehaviour, IPoolable
 
     private void Update()
     {
+        if (!IsSetup) return;
         CanSeePlayer = CanEnemySeePlayer();
+
+        if (Spawner) planetOrigin = Spawner.planet;
     }
 
     protected virtual void FixedUpdate()
     {
+        if (!IsSetup) return;
         HandleState();
     }
 
@@ -123,10 +132,19 @@ public abstract class EnemyBase : MonoBehaviour, IPoolable
 
     // Pooling | Instantiate Logic ------------------------------------------------------------------------
 
-    public virtual void Setup(int worldTier, Transform playerTarget, EnemySpawner spawner)
-
+    public virtual void Setup(int worldTier, Transform playerTarget, EnemySpawner spawner, bool DebugMode = false)
     {
         if (IsSetup) return;
+
+        if (DebugMode)
+        {
+            Spawner = spawner;
+            // Setup Health
+            CurrentHealth = MaxHealth;
+            // Setup UI
+            CreateHealthUI();
+            return;
+        }
 
         // randomize some of the agent properties so there is some variation in the enemy movement
         _agent.speed = Random.Range(minSpeed, maxSpeed);
@@ -155,7 +173,7 @@ public abstract class EnemyBase : MonoBehaviour, IPoolable
 
 
         // Requirements to enter Wander state initially
-        _currentWanderNode = EnemyManager.Instance.GetRandomWanderNodePosition();
+        _currentWanderNode = Spawner.GetRandomWanderNodePosition();
         _agent.SetDestination(_currentWanderNode.transform.position);
         if (newScentCo == null) newScentCo = StartCoroutine(GetRandomScentNode());
 
@@ -184,7 +202,7 @@ public abstract class EnemyBase : MonoBehaviour, IPoolable
         _currentState = EnemyState.Wander;
         if (healthUI) healthUI.gameObject.SetActive(false);
     }
-    
+
 
     void CreateHealthUI()
     {
@@ -195,19 +213,34 @@ public abstract class EnemyBase : MonoBehaviour, IPoolable
 
         healthUI = uiInstance.GetComponent<EnemyHealthUI>();
         healthUI.SetTarget(this); // `this` = enemy
+
+        // connect the status effect system with the healthUI
+        statusEffectEnemyManager.statusEffectRoot = healthUI.statusEffectRoot;
     }
 
 
-    public void TakeDamage(int damage)
+    public void TakeDamage(int damage, StatusEffectBase.StatusEffectType statusEffectType = StatusEffectBase.StatusEffectType.NONE, int statusApplicationChance = 0)
     {
-        Debug.Log("enemy taking dage");
+        Debug.Log("enemy taking damage | Status Effect: " + statusEffectType.ToString());
         CurrentHealth = Mathf.Clamp(CurrentHealth - damage, 0, MaxHealth);
         healthUI.UpdateHealthText();
+        meshFlashEffect.FlashAll(new MeshFlashEffect.FlashData(ColorManager.Instance.normalHitFlashMat, .1f));
 
         if (CurrentHealth <= 0)
         {
             InitiateDeath();
         }
+
+        // if not dead, check if a status effect chance was passed
+        if (statusEffectType == StatusEffectBase.StatusEffectType.NONE) return;
+
+        // we know there is a passed status effect chance event
+        if (Random.Range(0, 100) < statusApplicationChance)
+        {
+            Debug.Log("Adding Status to enemy");
+            statusEffectEnemyManager.AddStatus(statusEffectType, StatusEffectPlayerManager.Instance.GetStatusPrefab(statusEffectType));
+        }
+
     }
 
 
@@ -240,7 +273,7 @@ public abstract class EnemyBase : MonoBehaviour, IPoolable
         // until the player is within its range.
         if (Vector3.Distance(transform.position, _agent.destination) <= _wanderNodeCloseRange)
         {
-            _currentWanderNode = EnemyManager.Instance.GetRandomWanderNodePosition();
+            _currentWanderNode = Spawner.GetRandomWanderNodePosition();
             _agent.SetDestination(_currentWanderNode.transform.position);
         }
 
@@ -274,7 +307,7 @@ public abstract class EnemyBase : MonoBehaviour, IPoolable
             return;
         }
 
-        _agent.SetDestination(_currentScentNode.transform.position);
+        if (_agent && _agent.isOnNavMesh) _agent.SetDestination(_currentScentNode.transform.position);
     }
     
 
@@ -310,6 +343,8 @@ public abstract class EnemyBase : MonoBehaviour, IPoolable
         CanAttack = false;
         IsAttacking = true;
 
+        SetCanMove(false);
+
 
         AttackDataBase randomAttack = AvailableAttacks[Random.Range(0, AvailableAttacks.Count)];
         if (randomAttack == null) yield break;
@@ -318,7 +353,8 @@ public abstract class EnemyBase : MonoBehaviour, IPoolable
             + CastTime);
 
 
-        StartCoroutine(randomAttack.Execute(this));
+        yield return StartCoroutine(randomAttack.Execute(this));
+        SetCanMove(true);
 
         yield return new WaitForSeconds(CoolDown);
     }
@@ -380,7 +416,7 @@ public abstract class EnemyBase : MonoBehaviour, IPoolable
 
     public void SetCanMove(bool canMove)
     {
-        if (_agent != null)
+        if (_agent != null && _agent.isOnNavMesh)
         {
             _agent.isStopped = !canMove;
             _agent.updatePosition = canMove;
@@ -430,6 +466,7 @@ public abstract class EnemyBase : MonoBehaviour, IPoolable
         Debug.Log($"{gameObject.name} has died.");
         _currentState = EnemyState.Dead;
         _agent.enabled = false;
+        ExplosionManager.Instance.CreateExplosion(gameObject.transform.position, ExplosionManager.ExplosionType.SMALL);
         gameObject.SetActive(false);
         IsSetup = false;
         if (healthUI) healthUI.gameObject.SetActive(false);

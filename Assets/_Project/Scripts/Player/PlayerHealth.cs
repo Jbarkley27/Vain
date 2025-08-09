@@ -33,10 +33,11 @@ public class PlayerHealth : MonoBehaviour
 
     void Start()
     {
+        MaxHealth = StatManager.Instance.GetHealthValue();
         CurrentHealth = MaxHealth;
         HealthBonus = 0;
-        _healthSlider.maxValue = CurrentHealth;
-        _healthSlider.value = CurrentHealth;
+        _healthSlider.maxValue = MaxHealth;
+        _healthSlider.value = MaxHealth;
     }
 
     void Update()
@@ -45,6 +46,8 @@ public class PlayerHealth : MonoBehaviour
         {
             _healthSlider.value = Mathf.Lerp(_healthSlider.value, CurrentHealth, _healthSliderSpeed);
         }
+
+        _healthText.text = $"{CurrentHealth} | {MaxHealth}";
     }
 
     public void TakeDamage(int damage)

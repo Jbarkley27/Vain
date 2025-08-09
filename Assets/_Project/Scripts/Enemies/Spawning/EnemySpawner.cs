@@ -18,6 +18,14 @@ public class EnemySpawner : MonoBehaviour
     private bool isPlayerInZone = false;
     private bool enemiesSpawned = false;
     public List<EnemyBase> activeEnemies = new List<EnemyBase>();
+    public PlanetDetector planetDetector;
+    public List<GameObject> PlanetWanderNodes;
+    public Transform enemyWanderNodeParent;
+
+
+    [Header("Debug")]
+    public WaveConfig testWaveConfig;
+    public bool DebugMode = false;
 
     void Awake()
     {
@@ -26,6 +34,26 @@ public class EnemySpawner : MonoBehaviour
             if (point == null) continue;
             spawnPoints.Add(point);
         }
+
+         PlanetWanderNodes.Clear();
+
+        foreach (Transform scentNode in enemyWanderNodeParent)
+        {
+            PlanetWanderNodes.Add(scentNode.gameObject);
+        }
+    }
+
+    void Start()
+    {
+        if (DebugMode)
+        {
+            SpawnTestSubjects();
+        }
+    }
+
+    public GameObject GetRandomWanderNodePosition()
+    {
+        return PlanetWanderNodes[Random.Range(0, PlanetWanderNodes.Count)];
     }
 
     private void OnTriggerEnter(Collider other)
@@ -96,9 +124,28 @@ public class EnemySpawner : MonoBehaviour
         despawnCoroutine = null;
     }
 
+    public void SpawnTestSubjects()
+    {
+        Debug.Log("Spawning enemies for " + planet.Name);
+        // Planet currentPlanetPlayerIsOn = planetDetector.CurrentPlanetObject;
+        foreach (var entry in testWaveConfig.enemies)
+        {
+            for (int i = 0; i < entry.count; i++)
+            {
+                Vector3 spawnPos = EnemyManager.Instance.PlayerScentNodes[Random.Range(0, EnemyManager.Instance.PlayerScentNodes.Count)].gameObject.transform.position;
+
+                GameObject enemyObj = pooler.Spawn(entry.enemyID, spawnPos, Quaternion.identity);
+                EnemyBase enemy = enemyObj.GetComponent<EnemyBase>();
+                if (!enemy.IsSetup) enemy.Setup(entry.tier, player, this, true);
+                activeEnemies.Add(enemy);
+            }
+        }
+    }
+
     void SpawnWave()
     {
         Debug.Log("Spawning enemies for " + planet.Name);
+        // Planet currentPlanetPlayerIsOn = planetDetector.CurrentPlanetObject;
         foreach (var entry in waveConfig.enemies)
         {
             for (int i = 0; i < entry.count; i++)

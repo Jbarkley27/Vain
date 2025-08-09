@@ -228,7 +228,7 @@ GameObject:
   - component: {fileID: 128281581318759521}
   - component: {fileID: 4796275176560630874}
   - component: {fileID: 4894084772566939099}
-  - component: {fileID: 1001435315917788343}
+  - component: {fileID: 5313118561756958798}
   m_Layer: 9
   m_Name: MinimapMarker
   m_TagString: Untagged
@@ -319,7 +319,7 @@ MonoBehaviour:
   m_BlockingMask:
     serializedVersion: 2
     m_Bits: 4294967295
---- !u!114 &1001435315917788343
+--- !u!114 &5313118561756958798
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -328,11 +328,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 1010425069845381680}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6507c5c0707fb4ac1804690e64a0142c, type: 3}
+  m_Script: {fileID: 11500000, guid: a7f4e6d5c12a045f8973e07fd5d1a411, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _iconType: 2
-  iconVisual: {fileID: 0}
+  icon: {fileID: 7333373314777309514}
+  canvasGroupFlasher: {fileID: 7648521872569803700}
+  minimapIconType: 2
 --- !u!1 &2897623922215465347
 GameObject:
   m_ObjectHideFlags: 0
@@ -529,6 +530,8 @@ GameObject:
   m_Component:
   - component: {fileID: 2640414871150981466}
   - component: {fileID: 2336324081540552272}
+  - component: {fileID: 1347574172643082785}
+  - component: {fileID: 7648521872569803700}
   m_Layer: 9
   m_Name: Icon
   m_TagString: Untagged
@@ -565,6 +568,34 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3998118215550168716}
   m_CullTransparentMesh: 1
+--- !u!225 &1347574172643082785
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3998118215550168716}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
+--- !u!114 &7648521872569803700
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3998118215550168716}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dff960be8659540b88fb515d728d9b85, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  flashSpeed: 0.5
+  alphaMin: 0.2
+  alphaMax: 1
+  IsFlashing: 0
 --- !u!1 &4169511614093224442
 GameObject:
   m_ObjectHideFlags: 0
@@ -682,6 +713,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3819008030960564607}
   - component: {fileID: 7306853784618024514}
+  - component: {fileID: 5458674319741837338}
   m_Layer: 0
   m_Name: Visual
   m_TagString: Untagged
@@ -726,6 +758,18 @@ SphereCollider:
   serializedVersion: 3
   m_Radius: 4
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &5458674319741837338
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5661649231556783211}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a8bbe9f747beb4eee913a68002cf4f44, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &7890397609005815511
 GameObject:
   m_ObjectHideFlags: 0
@@ -739,6 +783,8 @@ GameObject:
   - component: {fileID: 2894944222097087603}
   - component: {fileID: 9098130642266119595}
   - component: {fileID: 6833046797504528415}
+  - component: {fileID: 3086775886318432129}
+  - component: {fileID: 351188836386347251}
   m_Layer: 0
   m_Name: Grunt
   m_TagString: Enemy
@@ -781,6 +827,10 @@ MonoBehaviour:
   IsSetup: 0
   Spawner: {fileID: 0}
   CanRotate: 1
+  planetOrigin: {fileID: 0}
+  statusEffectEnemyManager: {fileID: 3086775886318432129}
+  meshFlashEffect: {fileID: 5458674319741837338}
+  visual: {fileID: 5661649231556783211}
   _attackRange: 10
   _lookAtSpeed: 5
   _wanderNodeCloseRange: 10
@@ -848,9 +898,9 @@ Rigidbody:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7890397609005815511}
   serializedVersion: 4
-  m_Mass: 100
-  m_Drag: 30
-  m_AngularDrag: 30
+  m_Mass: 40
+  m_Drag: 5
+  m_AngularDrag: 5
   m_CenterOfMass: {x: 0, y: 0, z: 0}
   m_InertiaTensor: {x: 1, y: 1, z: 1}
   m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
@@ -888,6 +938,38 @@ SphereCollider:
   serializedVersion: 3
   m_Radius: 3
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &3086775886318432129
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7890397609005815511}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c1ccd57e24ba443e2879bc396ad70d3d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  statusEffectRoot: {fileID: 5661649231556783211}
+  CanAddEffect: 1
+  enemy: {fileID: 2164090299970486803}
+  statusEffectMax: 2
+--- !u!114 &351188836386347251
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7890397609005815511}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1d39f06ed60bd4456888ffabc1e1ae2e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  rb: {fileID: 9098130642266119595}
+  agent: {fileID: 2894944222097087603}
+  knockbackForce: 10
+  knockbackDuration: 0.3
 --- !u!1 &8117114540213977017
 GameObject:
   m_ObjectHideFlags: 0

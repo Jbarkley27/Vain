@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.UIElements;
 
 public class InputManager : MonoBehaviour
 {
@@ -7,6 +8,8 @@ public class InputManager : MonoBehaviour
     private PlayerInput _playerInput;
     private PlayerMovement _playerMovement;
     public MiniMap _miniMap;
+    public bool CanAcceptInputs = true;
+    public PlayerInfoUI playerInfoUI;
 
     [Header("Cursor")]
     public Vector2 CursorInput;
@@ -27,10 +30,14 @@ public class InputManager : MonoBehaviour
     [Header("Confirm Prompt")]
     public bool ConfirmPromptPressed = false;
 
+    [Header("Player Info")]
+    public bool PlayerInfoPressed = false;
 
     [Header("Current Device Settings")]
     public InputDevice CurrentDevice;
     public enum InputDevice { K_M, GAMEPAD };
+
+
 
 
     private void Start()
@@ -44,8 +51,8 @@ public class InputManager : MonoBehaviour
     void Update()
     {
         GetCurrentDevice();
-        if (!ExtractionManager.Instance.IsExtracting()) Boost();
-        if (!ExtractionManager.Instance.IsExtracting()) Shoot();
+        Boost();
+        Shoot();
     }
 
 
@@ -60,8 +67,6 @@ public class InputManager : MonoBehaviour
 
     public void Thrust(InputAction.CallbackContext context)
     {
-        if (ExtractionManager.Instance.IsExtracting()) return;
-
         if (context.performed)
         {
             ThrustInput = context.ReadValue<Vector2>();
@@ -70,11 +75,11 @@ public class InputManager : MonoBehaviour
 
     public void Dash(InputAction.CallbackContext context)
     {
-        if (ExtractionManager.Instance.IsExtracting()) return;
         if (context.performed)
         {
             DashPressed = true;
-            if (_playerMovement.CanDash) StartCoroutine(_playerMovement.Dash());
+            if (_playerMovement.CanDash)
+                StartCoroutine(PlayerSkillManager.Instance.dashSkillUI.UseSkill());
         }
         else if (context.canceled)
         {
@@ -84,7 +89,6 @@ public class InputManager : MonoBehaviour
 
     public void Boost()
     {
-
         if (_playerInput.actions["Boost"].IsPressed())
         {
             IsBoosting = true;
@@ -97,7 +101,6 @@ public class InputManager : MonoBehaviour
 
     public void OpenMinimap(InputAction.CallbackContext context)
     {
-        if (ExtractionManager.Instance.IsExtracting()) return;
         if (context.performed)
         {
             _miniMap.ToggleMinimapScale();
@@ -121,7 +124,6 @@ public class InputManager : MonoBehaviour
 
     public void UseSkill1(InputAction.CallbackContext context)
     {
-        if (ExtractionManager.Instance.IsExtracting()) return;
         if (context.performed)
         {
             if (PlayerSkillManager.Instance != null)
@@ -138,7 +140,6 @@ public class InputManager : MonoBehaviour
 
     public void UseSkill2(InputAction.CallbackContext context)
     {
-        if (ExtractionManager.Instance.IsExtracting()) return;
         if (context.performed)
         {
             if (PlayerSkillManager.Instance != null)
@@ -155,7 +156,6 @@ public class InputManager : MonoBehaviour
 
     public void ConfirmPrompt(InputAction.CallbackContext context)
     {
-        if (ExtractionManager.Instance.IsExtracting()) return;
         if (context.performed)
         {
             ConfirmPromptPressed = true;
@@ -169,7 +169,6 @@ public class InputManager : MonoBehaviour
 
     public void UseSkill3(InputAction.CallbackContext context)
     {
-        if (ExtractionManager.Instance.IsExtracting()) return;
         if (context.performed)
         {
             if (PlayerSkillManager.Instance != null)
@@ -180,6 +179,20 @@ public class InputManager : MonoBehaviour
             {
                 Debug.LogWarning("PlayerSkillManager instance is not available.");
             }
+        }
+    }
+
+
+    public void OpenPlayerInfo(InputAction.CallbackContext context)
+    {
+        if (context.performed)
+        {
+            PlayerInfoPressed = true;
+            playerInfoUI.HandlePlayerInfo();
+        }
+        else
+        {
+            PlayerInfoPressed = false;
         }
     }
 

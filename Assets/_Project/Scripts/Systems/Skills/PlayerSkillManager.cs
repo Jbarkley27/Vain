@@ -10,6 +10,8 @@ public class PlayerSkillManager : MonoBehaviour
     public List<Skill> equippedSkills = new List<Skill>();
 
     public static PlayerSkillManager Instance;
+    public DashSkillUI dashSkillUI;
+
     private void Awake()
     {
         if (Instance != null)

@@ -10,8 +10,11 @@ public class ProjectileBase : MonoBehaviour
     public float lifetime;
     public float timeAlive;
     public int damage;
+    public WeaponTypes.ElementType elementType;
+    public StatusEffectBase.StatusEffectType statusEffectType;
+    public float knockbackForce;
 
-    public void Initialize(Vector3 direction, float speed, AnimationCurve curve, float life, int damage)
+    public void Initialize(Vector3 direction, float speed, AnimationCurve curve, float life, int damage, float knockback = 0)
     {
         rb = GetComponent<Rigidbody>();
         moveDirection = direction;
@@ -20,9 +23,11 @@ public class ProjectileBase : MonoBehaviour
         lifetime = life;
         timeAlive = 0f;
         this.damage = damage;
+        this.knockbackForce = knockback;
 
         // Initial velocity
         rb.linearVelocity = moveDirection * baseSpeed;
+
     }
 
     void Update()

@@ -1,0 +1,18 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 0}
+  m_Name: Shader_2
+  m_EditorClassIdentifier: Assembly-CSharp::ShaderData
+  primary: {fileID: 2100000, guid: af9de318fd66f4de696c4cb0abc70867, type: 2}
+  secondary: {fileID: 2100000, guid: 3078b2e3893d548f3a284e909f24011c, type: 2}
+  tertiary: {fileID: 2100000, guid: 882bbf22643c54a6daea1a9b2bab28fb, type: 2}
+  quaternary: {fileID: 2100000, guid: 7d8fab10cd7a74b0fa6863f7f5924825, type: 2}

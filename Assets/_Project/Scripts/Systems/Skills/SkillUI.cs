@@ -26,7 +26,7 @@ public class SkillUI : MonoBehaviour
         }
         insertedSkill = skill;
         SetActive(true);
-        SetSkillIcon(skill.skillIcon);
+        SetSkillIcon(skill.icon);
         SetSliderColor(ColorManager.Instance.GetPrimaryColor(skill.elementType), ColorManager.Instance.GetSecondaryColor(skill.elementType));
     }
 
@@ -133,7 +133,7 @@ public class SkillUI : MonoBehaviour
         canvasGroup.alpha = .4f;
 
         // simulate skill execution
-        insertedSkill.Execute();
+        insertedSkill.Execute(this);
 
         // set the skill slider to 0
         SetSliderValue(0);

@@ -199,7 +199,7 @@ SphereCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Radius: 2.2
+  m_Radius: 4
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &6854431776339378128
 MonoBehaviour:
@@ -225,3 +225,8 @@ MonoBehaviour:
   lifetime: 0
   timeAlive: 0
   damage: 0
+  elementType: 0
+  statusEffectType: 0
+  knockbackForce: 0
+  testForce: 400
+  duration: 0.1

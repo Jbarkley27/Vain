@@ -1,15 +1,26 @@
 using UnityEngine;
 using Vector3 = UnityEngine.Vector3;
+using UnityEngine.UI;
+using UnityEngine.EventSystems;
+using System.Collections.Generic;
 
 public class WorldCursor : MonoBehaviour
 {
     public static WorldCursor instance;
-    
+
     [SerializeField] private LayerMask _cursorLayer;
     [SerializeField] private RectTransform _cursorUI;
     [SerializeField] private InputManager _inputManager;
     [SerializeField] private GameObject _physicalWorldCursor;
     [SerializeField] private float _cursorSpeed = 10;
+
+
+    [Header("Collision Detection")]
+    public GraphicRaycaster raycaster;
+    public EventSystem eventSystem;
+    public RectTransform targetUI;
+    public string filterTag = "TargetUI"; // Only detect elements with this tag
+    public GameObject CurrentHoveredGO;
 
     private void Awake()
     {
@@ -27,8 +38,8 @@ public class WorldCursor : MonoBehaviour
     void Update()
     {
         Cursor.visible = false;
-        if (ExtractionManager.Instance.IsExtracting()) return;
         CursorUI();
+        CheckForCollision();
     }
 
 
@@ -68,7 +79,6 @@ public class WorldCursor : MonoBehaviour
 
     public void MovePhysicalCursor()
     {
-        if (ExtractionManager.Instance.IsExtracting()) return;
         if (Camera.main == null || _physicalWorldCursor == null)
         {
             Debug.LogWarning("Camera.main or physicalWorldCursor is null");
@@ -84,7 +94,7 @@ public class WorldCursor : MonoBehaviour
         }
     }
 
-      public Vector3 GetDirectionFromWorldCursor(Vector3 source)
+    public Vector3 GetDirectionFromWorldCursor(Vector3 source)
     {
         if (_physicalWorldCursor == null)
         {
@@ -93,5 +103,32 @@ public class WorldCursor : MonoBehaviour
         }
 
         return _physicalWorldCursor.transform.position - source;
+    }
+
+
+    public void CheckForCollision()
+    {
+        Vector2 screenPos = targetUI.localPosition;
+
+        PointerEventData pointerData = new PointerEventData(eventSystem)
+        {
+            position = screenPos
+        };
+
+        // Debug.Log(screenPos);
+
+        List<RaycastResult> results = new List<RaycastResult>();
+        raycaster.Raycast(pointerData, results);
+
+        foreach (RaycastResult result in results)
+        {
+            if (result.gameObject != targetUI.gameObject &&
+                result.gameObject.CompareTag(filterTag))
+            {
+                Debug.Log($"Hit tagged UI object: {result.gameObject.name}");
+                // Do something here
+                CurrentHoveredGO = result.gameObject;
+            }
+        }
     }
 }
