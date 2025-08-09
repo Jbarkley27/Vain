@@ -47773,6 +47773,8 @@ GameObject:
   - component: {fileID: 1358715400}
   - component: {fileID: 1358715401}
   - component: {fileID: 1358715402}
+  - component: {fileID: 1358715404}
+  - component: {fileID: 1358715403}
   m_Layer: 0
   m_Name: '#Game Systems'
   m_TagString: Untagged
@@ -47826,7 +47828,7 @@ MonoBehaviour:
   MiniMap: {fileID: 1860958646}
   PlayerMovement: {fileID: 760552742}
   InputManager: {fileID: 760552739}
-  SpaceTimeSystem: {fileID: 0}
+  SpaceTimeSystem: {fileID: 1499944945}
 --- !u!114 &1358715391
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -48111,6 +48113,35 @@ MonoBehaviour:
   CurrentBadge: {fileID: 11400000, guid: 9e5e5dd660c1d4b10abdb0788620152b, type: 2}
   Icon: {fileID: 2062021277}
   Background: {fileID: 2062021277}
+--- !u!114 &1358715403
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1358715387}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fbb5d167c0a85489f93447ec0b7ec13a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  masterVolume: 1
+  musicVolume: 0.15
+--- !u!114 &1358715404
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1358715387}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ca2459199fa0945d59a86bea044360a8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  crossfadeTime: 2
+  musicBusPath: bus:/MusicBus
+  masterBusPath: bus:/Master Bus
 --- !u!1 &1359269343
 GameObject:
   m_ObjectHideFlags: 0

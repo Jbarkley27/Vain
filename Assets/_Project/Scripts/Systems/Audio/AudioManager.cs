@@ -31,7 +31,7 @@ public class AudioManager : MonoBehaviour
     private Bus musicBus;
     private Bus masterBus;
     public string musicBusPath = "bus:/MusicBus"; 
-    public string masterBusPath = "bus:/MasterBus";
+    public string masterBusPath = "bus:/Master Bus";
 
     void Awake()
     {
@@ -54,7 +54,7 @@ public class AudioManager : MonoBehaviour
     {
         // Initialize FMOD bus
         musicBus = RuntimeManager.GetBus(musicBusPath);
-        masterBus = RuntimeManager.GetBus(masterBusPath);
+        // masterBus = RuntimeManager.GetBus(masterBusPath);
 
         // Setup music queues
         musicQueues[MusicCategory.Ambient].Enqueue(AudioLibrary.Music_Ambient_1);
@@ -81,7 +81,7 @@ public class AudioManager : MonoBehaviour
         if (VolumeSettings.Instance != null)
         {
             musicBus.setVolume(VolumeSettings.Instance.musicVolume);
-            masterBus.setVolume(VolumeSettings.Instance.masterVolume);
+            // masterBus.setVolume(VolumeSettings.Instance.masterVolume);
         }
     }
 
