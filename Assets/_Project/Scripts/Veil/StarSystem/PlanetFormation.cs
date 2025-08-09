@@ -3,29 +3,30 @@ using System.Collections.Generic;
 
 public class PlanetFormation : MonoBehaviour
 {
-    public Transform ParentPlacementParent;
+    public Transform PlanetPlacement;
     public Transform SmallPOIListParent;
     public Transform MediumPOIListParent;
     public Transform LargePOIListParent;
-    public List<GameObject> planetFormation;
     public List<GameObject> smallPOIList;
     public List<GameObject> mediumPOIList;
     public List<GameObject> largePOIList;
     public Transform PlayerSpawnPosition;
+    public SectorManager.SectorType SectorType;
+    public Planet Planet;
 
-    public void SetupFormation()
+
+    void Start()
     {
-        planetFormation = new List<GameObject>();
+    }
+
+
+    public void SetupFormation(Planet planet)
+    {
         smallPOIList = new List<GameObject>();
         mediumPOIList = new List<GameObject>();
         largePOIList = new List<GameObject>();
 
         // Populate the lists with the children of the respective parent transforms
-        foreach (Transform poi in ParentPlacementParent)
-        {
-            planetFormation.Add(poi.gameObject);
-        }
-
         foreach (Transform poi in SmallPOIListParent)
         {
             poi.gameObject.AddComponent<POIState>();
@@ -42,6 +43,16 @@ public class PlanetFormation : MonoBehaviour
         {
             poi.gameObject.AddComponent<POIState>();
             largePOIList.Add(poi.gameObject);
+        }
+
+
+        // Set the planet reference
+        Planet = planet;
+
+        // Set the planet's position to the placement position
+        if (PlanetPlacement != null)
+        {
+            planet.transform.position = PlanetPlacement.position;
         }
     }
 }
