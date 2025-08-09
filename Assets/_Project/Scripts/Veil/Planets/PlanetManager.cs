@@ -6,23 +6,23 @@ using Random = UnityEngine.Random;
 
 public class PlanetManager : MonoBehaviour
 {
-    // Planet Formations
-    [System.Serializable]
-    public struct PlanetFormation
-    {
-        public Transform ParentPlacementParent;
-        public Transform SmallPOIListParent;
-        public Transform MediumPOIListParent;
-        public Transform LargePOIListParent;
-        public List<GameObject> planetFormation;
-        public List<GameObject> smallPOIList;
-        public List<GameObject> mediumPOIList;
-        public List<GameObject> largePOIList;
-    }
+    // // Planet Formations
+    // [System.Serializable]
+    // public struct PlanetFormation
+    // {
+    //     public Transform ParentPlacementParent;
+    //     public Transform SmallPOIListParent;
+    //     public Transform MediumPOIListParent;
+    //     public Transform LargePOIListParent;
+    //     public List<GameObject> planetFormation;
+    //     public List<GameObject> smallPOIList;
+    //     public List<GameObject> mediumPOIList;
+    //     public List<GameObject> largePOIList;
+    // }
 
     public List<PlanetFormation> planetaryFormations = new List<PlanetFormation>();
     public List<Planet> planets = new List<Planet>();
-    public Vector3 PlayerSpawnPosition = new Vector3(-2500, 0, -70);
+    // public Vector3 PlayerSpawnPosition = new Vector3(-2500, 0, -70);
 
 
 
@@ -37,7 +37,10 @@ public class PlanetManager : MonoBehaviour
     {
         Debug.Log("Creating Veil");
 
-        PlanetFormation newFormation = planetaryFormations[Random.Range(0, planetaryFormations.Count)];
+        PlanetFormation newFormation = Instantiate(planetaryFormations[Random.Range(0, planetaryFormations.Count)]
+            , Vector3.zero, Quaternion.identity);
+
+        newFormation.SetupFormation();
 
         // Get All Locations of POI from Selected Formation
         foreach (Transform poi in newFormation.ParentPlacementParent)
@@ -73,11 +76,12 @@ public class PlanetManager : MonoBehaviour
 
         // copy the available event and landmark locations from the new formation
 
-        // List<Vector3> landmarkLocations = newFormation.availableLandmarkLocations.ToList();
 
 
 
-        // GlobalDataStore.Instance.Player.GetComponent<Rigidbody>().position = PlayerSpawnPosition;
+        GlobalDataStore.Instance.Player.GetComponent<Rigidbody>().position = newFormation.PlayerSpawnPosition.transform.position;
+
+        GlobalDataStore.Instance.SpaceTimeSystem.StartAtZero();
 
         Debug.Log("Veil Creation Completed");
     }

@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using DG.Tweening;
 using UnityEngine;
 using UnityEngine.AI;
 using Random=UnityEngine.Random;
@@ -37,6 +38,8 @@ public abstract class EnemyBase : MonoBehaviour, IPoolable
     public bool CanRotate = true;
     public Planet planetOrigin;
     public StatusEffectEnemyManager statusEffectEnemyManager;
+    public MeshFlashEffect meshFlashEffect;
+    public GameObject visual;
 
 
     [Header("AI Settings")]
@@ -221,6 +224,7 @@ public abstract class EnemyBase : MonoBehaviour, IPoolable
         Debug.Log("enemy taking damage | Status Effect: " + statusEffectType.ToString());
         CurrentHealth = Mathf.Clamp(CurrentHealth - damage, 0, MaxHealth);
         healthUI.UpdateHealthText();
+        meshFlashEffect.FlashAll(new MeshFlashEffect.FlashData(ColorManager.Instance.normalHitFlashMat, .1f));
 
         if (CurrentHealth <= 0)
         {
@@ -303,7 +307,7 @@ public abstract class EnemyBase : MonoBehaviour, IPoolable
             return;
         }
 
-        _agent.SetDestination(_currentScentNode.transform.position);
+        if (_agent && _agent.isOnNavMesh) _agent.SetDestination(_currentScentNode.transform.position);
     }
     
 
@@ -339,6 +343,8 @@ public abstract class EnemyBase : MonoBehaviour, IPoolable
         CanAttack = false;
         IsAttacking = true;
 
+        SetCanMove(false);
+
 
         AttackDataBase randomAttack = AvailableAttacks[Random.Range(0, AvailableAttacks.Count)];
         if (randomAttack == null) yield break;
@@ -347,7 +353,8 @@ public abstract class EnemyBase : MonoBehaviour, IPoolable
             + CastTime);
 
 
-        StartCoroutine(randomAttack.Execute(this));
+        yield return StartCoroutine(randomAttack.Execute(this));
+        SetCanMove(true);
 
         yield return new WaitForSeconds(CoolDown);
     }
@@ -409,7 +416,7 @@ public abstract class EnemyBase : MonoBehaviour, IPoolable
 
     public void SetCanMove(bool canMove)
     {
-        if (_agent != null)
+        if (_agent != null && _agent.isOnNavMesh)
         {
             _agent.isStopped = !canMove;
             _agent.updatePosition = canMove;
@@ -459,6 +466,7 @@ public abstract class EnemyBase : MonoBehaviour, IPoolable
         Debug.Log($"{gameObject.name} has died.");
         _currentState = EnemyState.Dead;
         _agent.enabled = false;
+        ExplosionManager.Instance.CreateExplosion(gameObject.transform.position, ExplosionManager.ExplosionType.SMALL);
         gameObject.SetActive(false);
         IsSetup = false;
         if (healthUI) healthUI.gameObject.SetActive(false);

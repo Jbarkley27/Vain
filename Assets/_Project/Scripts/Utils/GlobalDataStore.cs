@@ -10,6 +10,8 @@ public class GlobalDataStore : MonoBehaviour
     public RectTransform worldCursorUI;
     public MiniMap MiniMap;
     public PlayerMovement PlayerMovement;
+    public InputManager InputManager;
+    public SpaceTimeSystem SpaceTimeSystem;
 
     private void Awake()
     {

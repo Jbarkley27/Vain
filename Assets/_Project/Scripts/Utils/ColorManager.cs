@@ -15,6 +15,8 @@ public class ColorManager : MonoBehaviour
 
     public Color corrosionPrimaryColor;
     public Color corrosionSecondaryColor;
+    public Material normalHitFlashMat;
+
 
     private void Awake()
     {
@@ -68,4 +70,13 @@ public class ColorManager : MonoBehaviour
                 return Color.white; // Default color if unknown
         }
     }
+}
+
+[CreateAssetMenu(fileName = "New Shader", menuName = "Ship Shader/Shader")]
+public class ShaderData : ScriptableObject
+{
+    public Material primary;
+    public Material secondary;
+    public Material tertiary;
+    public Material quaternary;
 }

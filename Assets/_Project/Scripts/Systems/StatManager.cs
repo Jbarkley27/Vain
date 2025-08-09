@@ -104,6 +104,21 @@ public class StatManager : MonoBehaviour
     }
 
 
+
+    public void UpdateStatValue(StatType type, int amount)
+    {
+        foreach (Stat stat in AllStats)
+        {
+            if (stat.statType == type)
+            {
+                stat.UpdateStatValue(amount);
+            }
+        }
+
+        Debug.Log("No stat was found");
+    }
+
+
     public float GetDashRegenStat()
     {
         return Mathf.Clamp(BaseCooldown - (GetStat(StatType.DASH_COOLDOWN) * ReductionStep), 1, 40);
@@ -141,4 +156,7 @@ public class StatManager : MonoBehaviour
         Debug.Log("Couldn't find elemental value");
         return 0;
     }
+
+
+
 }

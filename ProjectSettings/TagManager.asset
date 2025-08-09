@@ -12,6 +12,7 @@ TagManager:
   - Enemy
   - PlanetColorChange
   - TargetUI
+  - Ground
   layers:
   - Default
   - TransparentFX

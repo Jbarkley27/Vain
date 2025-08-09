@@ -16,18 +16,18 @@ MonoBehaviour:
   description: 
   icon: {fileID: 21300000, guid: f8de00612eb8c4a9ba5a7d054a2f6cd9, type: 3}
   FireRate: 0.15
-  MaxAmmo: 100
+  MaxAmmo: 200
   CooldownRate: 0
   BaseDamage: 1
   RegenRate: 0.1
-  CurrentAmmo: 100
+  CurrentAmmo: 200
   ProjectilePrefab: {fileID: 8010873185767639128, guid: eb84250b586134b8cbd44a0c16b539db, type: 3}
   Accuracy: 0
   BurstAmount: 1
   BurstTime: 0
   BurstAmountPerShot: 1
   BurstAmountPerShotFireRate: 0
-  ProjectileSpeed: 500
+  ProjectileSpeed: 1000
   Range: 5
   FireType: 0
   animationCurve:
@@ -57,5 +57,6 @@ MonoBehaviour:
   BlasterIcon: {fileID: 21300000, guid: f8de00612eb8c4a9ba5a7d054a2f6cd9, type: 3}
   ScreenShakeProfile:
     amplitudeGain: 1
-    frequencyGain: 2
-    shakeDuration: 0.2
+    frequencyGain: 1
+    shakeDuration: 0.1
+  knockbackForce: 400

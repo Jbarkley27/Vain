@@ -1,4 +1,5 @@
 using UnityEngine;
+using Random=UnityEngine.Random;
 
 [RequireComponent(typeof(Rigidbody))]
 public class PlayerProjectile : ProjectileBase
@@ -17,6 +18,9 @@ public class PlayerProjectile : ProjectileBase
             Destroy(gameObject);
     }
 
+    public float testForce;
+    public float duration;
+
     public override void OnTriggerEnter(Collider collision)
     {
         // Debug.Log("Hit " + collision.gameObject.name);
@@ -33,12 +37,23 @@ public class PlayerProjectile : ProjectileBase
 
 
             enemy.TakeDamage(damage + StatManager.Instance.GetElementDamageValue(elementType), statusEffectType, 100);
+
+            // Get direction from attacker to target
+            Vector3 direction = transform.position - collision.transform.position;
+
+            // Remove vertical component for horizontal knockback
+            direction.y = 0f;
+
+            // Normalize the result
+            direction.Normalize();
+
+            if(collision.gameObject) collision.gameObject.GetComponent<KnockbackReceiver>().ApplyKnockback(direction, Random.Range(knockbackForce, knockbackForce + 70f), duration);
             Destroy(gameObject);
             // }
         }
         // else
-            // {
-            //     Destroy(gameObject);
-            // }
-        }
+        // {
+        //     Destroy(gameObject);
+        // }
+    }
 }

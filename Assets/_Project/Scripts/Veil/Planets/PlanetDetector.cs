@@ -6,6 +6,13 @@ public class PlanetDetector : MonoBehaviour
     [SerializeField] private PlanetZoneUI _planetZoneUI;
     public Planet CurrentPlanetObject;
     public StarfieldColorManager starfieldColorManager;
+    public string DefaultPlanetName = "Void"; // Default planet name when not in a specific zone
+
+    void Start()
+    {
+        CurrentPlanet = DefaultPlanetName;
+        CurrentPlanetObject = null;
+    }
 
     private void OnTriggerEnter(Collider other)
     {
@@ -39,7 +46,7 @@ public class PlanetDetector : MonoBehaviour
             PlanetZone planetZone = other.GetComponent<PlanetZone>();
             if (planetZone == null) return;
 
-            CurrentPlanet = "Void";
+            CurrentPlanet = DefaultPlanetName;
             CurrentPlanetObject = null;
             Debug.Log($"Player exited {planetZone.PlanetName}'s zone.");
         }

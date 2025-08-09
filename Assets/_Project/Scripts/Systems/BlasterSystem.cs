@@ -44,6 +44,7 @@ public class WeaponSystems : MonoBehaviour
     public TMP_Text currentAmmo;
     public TMP_Text maxAmmo;
     public Image blasterIcon;
+    public CanvasGroup inputCG;
 
     
 
@@ -80,6 +81,7 @@ public class WeaponSystems : MonoBehaviour
     void Update()
     {
         ListenForShooting();
+        inputCG.alpha = _inputManager.IsShooting ? .2f : .9f; 
     }
 
 
@@ -139,7 +141,7 @@ public class WeaponSystems : MonoBehaviour
                 GameObject projectile = Instantiate(
                     EquippedBlaster.ProjectilePrefab,
                     _playerFireSource.transform.position,
-                    Quaternion.identity);
+                    Quaternion.LookRotation(transform.forward));
 
                 ScreenShakeManager.Instance.DoShake(EquippedBlaster.ScreenShakeProfile);
 
