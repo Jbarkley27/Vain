@@ -27,6 +27,12 @@ public class AudioManager : MonoBehaviour
     [Header("Crossfade Settings")]
     public float crossfadeTime = 2f; // seconds
 
+    [Header("FMOD Busses")]
+    private Bus musicBus;
+    private Bus masterBus;
+    public string musicBusPath = "bus:/MusicBus"; 
+    public string masterBusPath = "bus:/MasterBus";
+
     void Awake()
     {
         if (Instance != null && Instance != this)
@@ -41,6 +47,41 @@ public class AudioManager : MonoBehaviour
         foreach (MusicCategory category in System.Enum.GetValues(typeof(MusicCategory)))
         {
             musicQueues[category] = new Queue<string>();
+        }
+    }
+
+    void Start()
+    {
+        // Initialize FMOD bus
+        musicBus = RuntimeManager.GetBus(musicBusPath);
+        masterBus = RuntimeManager.GetBus(masterBusPath);
+
+        // Setup music queues
+        musicQueues[MusicCategory.Ambient].Enqueue(AudioLibrary.Music_Ambient_1);
+        musicQueues[MusicCategory.Ambient].Enqueue(AudioLibrary.Music_Ambient_2);
+        musicQueues[MusicCategory.Ambient].Enqueue(AudioLibrary.Music_Ambient_3);
+        musicQueues[MusicCategory.Ambient].Enqueue(AudioLibrary.Music_Ambient_4);
+        musicQueues[MusicCategory.Ambient].Enqueue(AudioLibrary.Music_Ambient_5);
+        musicQueues[MusicCategory.Ambient].Enqueue(AudioLibrary.Music_Ambient_6);
+        musicQueues[MusicCategory.Ambient].Enqueue(AudioLibrary.Music_Ambient_7);
+        musicQueues[MusicCategory.Battle].Enqueue(AudioLibrary.Music_Battle_1);
+        musicQueues[MusicCategory.Battle].Enqueue(AudioLibrary.Music_Battle_2);
+        musicQueues[MusicCategory.Battle].Enqueue(AudioLibrary.Music_Battle_3);
+        musicQueues[MusicCategory.Battle].Enqueue(AudioLibrary.Music_Battle_4);
+        musicQueues[MusicCategory.Boss].Enqueue(AudioLibrary.Music_Boss_1);
+        musicQueues[MusicCategory.Boss].Enqueue(AudioLibrary.Music_Boss_2);
+        musicQueues[MusicCategory.Boss].Enqueue(AudioLibrary.Music_Boss_3);
+        // Start with ambient music
+        StartMusic(MusicCategory.Ambient);
+    }
+
+    void Update()
+    {
+        // Update FMOD bus volumes based on settings
+        if (VolumeSettings.Instance != null)
+        {
+            musicBus.setVolume(VolumeSettings.Instance.musicVolume);
+            masterBus.setVolume(VolumeSettings.Instance.masterVolume);
         }
     }
 
