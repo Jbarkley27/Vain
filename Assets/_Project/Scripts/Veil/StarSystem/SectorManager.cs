@@ -12,30 +12,31 @@ public class SectorManager : MonoBehaviour
     }
 
     public SectorType CurrentSector;
-
     public GameObject SectorBounds;
+
+    public PlanetFormationBase PlanetFormationBase;
 
     [Header("Outer Sector")]
     public int OuterSectorPlanetCount = 6;
-    public List<PlanetFormation> SectorOuterPossiblePlanetFormations = new List<PlanetFormation>();
+    public List<PlanetFormationData> SectorOuterPossiblePlanetFormationDatas = new List<PlanetFormationData>();
     public List<Planet> OuterSectorPossiblePlanets = new List<Planet>();
-    public List<PlanetFormation> GeneratedOuterSectorPlanetFormations = new List<PlanetFormation>();
+    public List<PlanetFormationData> GeneratedOuterSectorPlanetFormationDatas = new List<PlanetFormationData>();
 
 
 
     [Header("Middle Sector")]
     public int MiddleSectorPlanetCount = 7;
-    public List<PlanetFormation> SectorMiddlePossiblePlanetFormations = new List<PlanetFormation>();
+    public List<PlanetFormationData> SectorMiddlePossiblePlanetFormationDatas = new List<PlanetFormationData>();
     public List<Planet> MiddleSectorPossiblePlanets = new List<Planet>();
-    public List<PlanetFormation> GeneratedMiddleSectorPlanetFormations = new List<PlanetFormation>();
+    public List<PlanetFormationData> GeneratedMiddleSectorPlanetFormationDatas = new List<PlanetFormationData>();
 
 
 
     [Header("Inner Sector")]
     public int InnerSectorPlanetCount = 8;
-    public List<PlanetFormation> SectorInnerPossiblePlanetFormations = new List<PlanetFormation>();
+    public List<PlanetFormationData> SectorInnerPossiblePlanetFormationDatas = new List<PlanetFormationData>();
     public List<Planet> InnerSectorPossiblePlanets = new List<Planet>();
-    public List<PlanetFormation> GeneratedInnerSectorPlanetFormations = new List<PlanetFormation>();
+    public List<PlanetFormationData> GeneratedInnerSectorPlanetFormationDatas = new List<PlanetFormationData>();
 
 
     [Header("Center Sector")]
@@ -65,17 +66,20 @@ public class SectorManager : MonoBehaviour
         // Get random planet formations for the outer sector
         for (int i = 0; i < OuterSectorPlanetCount; i++)
         {
-            PlanetFormation randomFormation = SectorOuterPossiblePlanetFormations[Random.Range(0, SectorOuterPossiblePlanetFormations.Count)];
 
+            // Get a random formation from the possible formations list
+            PlanetFormationData randomFormation = SectorOuterPossiblePlanetFormationDatas[Random.Range(0, SectorOuterPossiblePlanetFormationDatas.Count)];
+            GeneratedOuterSectorPlanetFormationDatas.Add(Instantiate(randomFormation, Vector3.zero, Quaternion.identity));
+
+
+            // Get a random planet from the possible planets list
+            SectorOuterPossiblePlanetFormationDatas.Remove(randomFormation);
             Planet newRandomPlanet = OuterSectorPossiblePlanets[Random.Range(0, OuterSectorPossiblePlanets.Count)];
             OuterSectorPossiblePlanets.Remove(newRandomPlanet);
 
-            GeneratedOuterSectorPlanetFormations.Add(Instantiate(randomFormation, Vector3.zero, Quaternion.identity));
 
-            randomFormation.SetupFormation(newRandomPlanet);
-
-            // after adding we need to remove it from the possible list to avoid duplicates
-            SectorOuterPossiblePlanetFormations.Remove(randomFormation);
+            // setup formation base
+            PlanetFormationBase.CreateFormation(newRandomPlanet, randomFormation);
         }
     }
 
@@ -85,25 +89,8 @@ public class SectorManager : MonoBehaviour
 
         Debug.Log("Creating Middle Sector");
 
-        CurrentSector = SectorType.Outer;
-
-        Debug.Log("Creating Outer Sector");
-
-        // Get random planet formations for the outer sector
-        for (int i = 0; i < OuterSectorPlanetCount; i++)
-        {
-            PlanetFormation randomFormation = SectorOuterPossiblePlanetFormations[Random.Range(0, SectorOuterPossiblePlanetFormations.Count)];
-
-            Planet newRandomPlanet = OuterSectorPossiblePlanets[Random.Range(0, OuterSectorPossiblePlanets.Count)];
-            OuterSectorPossiblePlanets.Remove(newRandomPlanet);
-
-            GeneratedOuterSectorPlanetFormations.Add(Instantiate(randomFormation, Vector3.zero, Quaternion.identity));
-
-            randomFormation.SetupFormation(newRandomPlanet);
-
-            // after adding we need to remove it from the possible list to avoid duplicates
-            SectorOuterPossiblePlanetFormations.Remove(randomFormation);
-        }
+        // Logic to create the middle sector can be added here
+        // This could involve instantiating planet formations and setting up planets similar to the outer sector.
     }
 
 
