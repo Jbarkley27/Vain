@@ -13,6 +13,8 @@ public class SectorManager : MonoBehaviour
 
     public SectorType CurrentSector;
 
+    public GameObject SectorBounds;
+
     [Header("Outer Sector")]
     public int OuterSectorPlanetCount = 6;
     public List<PlanetFormation> SectorOuterPossiblePlanetFormations = new List<PlanetFormation>();
@@ -39,12 +41,19 @@ public class SectorManager : MonoBehaviour
     [Header("Center Sector")]
     public int CenterSectorPlanetCount = 1;
 
-    
+
 
 
     void Start()
     {
         CreateOuterSector();
+
+        // Hide all mesh renderes of SectorBounds children
+        // leave on during development to see the sector bounds
+        foreach (MeshRenderer meshRenderer in SectorBounds.GetComponentsInChildren<MeshRenderer>())
+        {
+            meshRenderer.enabled = false;
+        }
     }
 
     public void CreateOuterSector()

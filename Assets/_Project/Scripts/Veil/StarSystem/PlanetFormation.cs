@@ -45,6 +45,11 @@ public class PlanetFormation : MonoBehaviour
             largePOIList.Add(poi.gameObject);
         }
 
+        Planet newPlanet = Instantiate(planet, PlanetPlacement.transform);
+
+        // update planet formation position so that planet is at the center relative to its size
+        Vector3 offset = new Vector3(newPlanet.Size, -newPlanet.Size, newPlanet.Size);
+        PlanetPlacement.position = offset;
 
         // Set the planet reference
         Planet = planet;
