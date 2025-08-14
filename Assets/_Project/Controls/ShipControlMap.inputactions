@@ -103,6 +103,15 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "Debug",
+                    "type": "Button",
+                    "id": "2c0a2ddc-4c32-45f7-b03a-fc8f85eec47f",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -389,6 +398,28 @@
                     "processors": "",
                     "groups": ";Gamepad",
                     "action": "OpenPlayerInfo",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "dc1c4889-192e-4003-89b0-9d42e4c9f6f9",
+                    "path": "",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Debug",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "422376a3-9839-49da-8ad8-d6bbd9362281",
+                    "path": "<Keyboard>/0",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";M&K",
+                    "action": "Debug",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

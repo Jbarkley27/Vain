@@ -27,14 +27,17 @@ public class StarSystemManager : MonoBehaviour
         Debug.Log("Veil Creation Completed");
     }
 
-
-    public void CreateNextSector()
+    public void LoadIntoPlanetarySystem(int i)
     {
-        // Logic to create the next sector can be added here
-        Debug.Log("Creating Next Sector");
-        
-        // Example: You might want to call sectorManager.CreateOuterSector() or similar methods
-        // based on the current sector type or other conditions.
-    }
+        if (sectorManager == null || sectorManager.PlanetFormationBase == null)
+        {
+            Debug.LogError("SectorManager or PlanetFormationBase not found!");
+            return;
+        }
 
+        Debug.Log("Initiating Planetary Entry");
+        sectorManager.PlanetFormationBase.CreatePlanetarySystem(
+            sectorManager.OuterSectorPlanets[i]
+        );
+    }
 }

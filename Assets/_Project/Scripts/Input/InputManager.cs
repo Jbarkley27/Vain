@@ -1,6 +1,5 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.UIElements;
 
 public class InputManager : MonoBehaviour
 {
@@ -194,6 +193,15 @@ public class InputManager : MonoBehaviour
         {
             PlayerInfoPressed = false;
         }
+    }
+
+    public void DebugButton(InputAction.CallbackContext context)
+    {
+        if (context.performed)
+        {
+            GlobalDataStore.Instance.StarSystemManager.LoadIntoPlanetarySystem(Random.Range(0, GlobalDataStore.Instance.StarSystemManager.sectorManager.OuterSectorPlanets.Count));
+        }
+
     }
 
 

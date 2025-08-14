@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 0}
   m_Name: Shader_1
   m_EditorClassIdentifier: Assembly-CSharp::ShaderData
-  primary: {fileID: 2100000, guid: c032ddc92bded490997d417273102425, type: 2}
-  secondary: {fileID: 2100000, guid: 68b1515a250d146d4ae628a7998d4c28, type: 2}
+  primary: {fileID: 2100000, guid: 18d79b7a2a5074889983ba0a927ce7e5, type: 2}
+  secondary: {fileID: 2100000, guid: c740d522930564fcaa9cf6108e7477d4, type: 2}
   tertiary: {fileID: 2100000, guid: 95c51631735704af5b737770e8c24895, type: 2}
   quaternary: {fileID: 2100000, guid: 2dbd20771acf5410d932b171a5567ba4, type: 2}

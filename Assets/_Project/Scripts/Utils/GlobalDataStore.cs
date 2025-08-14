@@ -12,6 +12,8 @@ public class GlobalDataStore : MonoBehaviour
     public PlayerMovement PlayerMovement;
     public InputManager InputManager;
     public SpaceTimeSystem SpaceTimeSystem;
+    public StarSystemManager StarSystemManager;
+    public StarfieldColorManager StarfieldColorManager;
 
     private void Awake()
     {

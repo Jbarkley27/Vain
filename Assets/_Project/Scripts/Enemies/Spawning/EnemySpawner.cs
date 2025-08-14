@@ -47,7 +47,8 @@ public class EnemySpawner : MonoBehaviour
     {
         if (DebugMode)
         {
-            SpawnTestSubjects();
+            Debug.Log("Bypassing Debug Mode for now");
+            // SpawnTestSubjects();
         }
     }
 

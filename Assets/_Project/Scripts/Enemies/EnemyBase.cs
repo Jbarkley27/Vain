@@ -109,6 +109,9 @@ public abstract class EnemyBase : MonoBehaviour, IPoolable
     protected virtual void Awake()
     {
         _agent = GetComponent<NavMeshAgent>();
+        // Let physics handle movement
+        _agent.updatePosition = false;
+        _agent.updateRotation = false;
     }
 
     private void Update()
@@ -123,6 +126,13 @@ public abstract class EnemyBase : MonoBehaviour, IPoolable
     {
         if (!IsSetup) return;
         HandleState();
+
+        // Continuously update path if target moves
+        // if (target != null && _agent != null && _agent.isOnNavMesh && _currentState != EnemyState.Wander && !IsAttacking)
+        //     _agent.SetDestination(target.position);
+
+        // Use physics to move the enemy
+        UsePhysicsToMove();
     }
 
 
@@ -134,8 +144,10 @@ public abstract class EnemyBase : MonoBehaviour, IPoolable
 
     public virtual void Setup(int worldTier, Transform playerTarget, EnemySpawner spawner, bool DebugMode = false)
     {
+        gameObject.name = "Testing 1";
         if (IsSetup) return;
 
+        gameObject.name = "Testing  === Winner";
         if (DebugMode)
         {
             Spawner = spawner;
@@ -274,6 +286,7 @@ public abstract class EnemyBase : MonoBehaviour, IPoolable
         if (Vector3.Distance(transform.position, _agent.destination) <= _wanderNodeCloseRange)
         {
             _currentWanderNode = Spawner.GetRandomWanderNodePosition();
+            target = _currentWanderNode.transform;
             _agent.SetDestination(_currentWanderNode.transform.position);
         }
 
@@ -281,6 +294,7 @@ public abstract class EnemyBase : MonoBehaviour, IPoolable
         if (GlobalDataStore.Instance.PlanetDetector.CurrentPlanetObject != null)
         {
             _currentScentNode = EnemyManager.Instance.GetRandomPlayerScentNode(); 
+            target = _currentWanderNode.transform;
             _currentState = EnemyState.Seek;
         }
     }
@@ -309,12 +323,40 @@ public abstract class EnemyBase : MonoBehaviour, IPoolable
 
         if (_agent && _agent.isOnNavMesh) _agent.SetDestination(_currentScentNode.transform.position);
     }
+
+
+    public void UsePhysicsToMove()
+    {
+        if (_agent.pathPending || _agent.remainingDistance <= _agent.stoppingDistance)
+            return;
+
+        // Get direction toward next NavMesh corner
+        Vector3 dir = (_agent.steeringTarget - transform.position).normalized;
+
+        // Apply physics movement
+        _rb.AddForce(dir * _agent.speed, ForceMode.Acceleration);
+
+        // Limit max speed
+        if (_rb.linearVelocity.magnitude > maxSpeed)
+            _rb.linearVelocity = _rb.linearVelocity.normalized * maxSpeed;
+
+        // Rotate toward movement
+        // if (dir.sqrMagnitude > 0.01f)
+        // {
+        //     Quaternion lookRot = Quaternion.LookRotation(dir);
+        //     _rb.MoveRotation(Quaternion.Slerp(_rb.rotation, lookRot, Time.fixedDeltaTime * 5f));
+        // }
+    }
     
 
 
+
+
+
+    // Attack State Logic --------------------------------------------------------------------------------
+
     protected virtual void Attack()
     {
-        Debug.Log($"{gameObject.name} is trying to attack.");
         RotateTowards(GlobalDataStore.Instance.Player.transform.position);
         _agent.updateRotation = false;
 
@@ -329,9 +371,10 @@ public abstract class EnemyBase : MonoBehaviour, IPoolable
         // attack
         if (CanAttack && !IsAttacking)
         {
-            StartCoroutine(InitializeAttack());
+            // StartCoroutine(InitializeAttack());
+            Debug.Log($"{gameObject.name} is starting an attack.");
         }
-        
+
 
         if (!IsAttacking) _agent.SetDestination(_currentScentNode.transform.position);
     }

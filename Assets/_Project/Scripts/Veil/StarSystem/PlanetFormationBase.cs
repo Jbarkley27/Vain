@@ -12,7 +12,6 @@ public class PlanetFormationBase : MonoBehaviour
     public List<GameObject> largePOIList;
     public Transform PlayerSpawnPosition;
     public Planet Planet = null;
-    public List<GameObject> SpawnedPOIs = new List<GameObject>();
 
 
     void Start()
@@ -23,18 +22,14 @@ public class PlanetFormationBase : MonoBehaviour
 
     public void ClearFormation()
     {
-        // Clear the children of the PlanetPlacement transform
-        foreach (GameObject child in SpawnedPOIs)
-        {
-            Destroy(child);
-        }
-
-        if (Planet != null) Destroy(Planet.gameObject);
+        if (PlanetPlacement.childCount > 0) Destroy(PlanetPlacement.GetChild(0).gameObject);
+        Planet = null;
     }
 
 
-    public void CreateFormation(Planet planet, PlanetFormationData formationData)
+    public void CreatePlanetarySystem(Planet planet)
     {
+        Debug.Log($"Creating Planetary System for {planet.Name}");
         // Clear previous formation
         ClearFormation();
 
@@ -52,6 +47,8 @@ public class PlanetFormationBase : MonoBehaviour
         {
             planet.transform.position = PlanetPlacement.position;
         }
+
+        GlobalDataStore.Instance.StarfieldColorManager.ChangeColor(planet.PlanetStarfieldColor);
     }
 
 
@@ -80,6 +77,6 @@ public class PlanetFormationBase : MonoBehaviour
             largePOIList.Add(poi.gameObject);
         }
 
-        ClearFormation();
+        // ClearFormation();
     }
 }
