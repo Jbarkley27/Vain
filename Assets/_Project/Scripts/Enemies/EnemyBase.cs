@@ -2,8 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using DG.Tweening;
 using UnityEngine;
-using UnityEngine.AI;
-using Random=UnityEngine.Random;
 
 
 /*
@@ -32,27 +30,35 @@ public abstract class EnemyBase : MonoBehaviour, IPoolable
     public EnemyID EnemyID;
     public EnemyState _currentState = EnemyState.Wander;
     public Rigidbody _rb;
-    protected NavMeshAgent _agent;
     public bool IsSetup = false;
     public EnemySpawner Spawner;
-    public bool CanRotate = true;
-    public Planet planetOrigin;
     public StatusEffectEnemyManager statusEffectEnemyManager;
     public MeshFlashEffect meshFlashEffect;
-    public GameObject visual;
 
 
-    [Header("AI Settings")]
-    public float _attackRange = 5f;
+
+    [Header("AI Behaviour Settings")]
+    // public float _attackRange = 5f;
     public float _lookAtSpeed = 5f;
-    public float _wanderNodeCloseRange = 2f;
-    public float _stoppingDistance;
-    public float _avoidanceRadius;
-    public float _baseAcceleration = 20f;
     public float minSpeed;
     public float maxSpeed;
+    public float _speed;
+    public float _SeekSpeedMultiplier = 1.5f;
+
+
+
+    [Tooltip("This controls how frequently the enemy will change either player scent node or wander node.\n The lower the less time is also spent sitting still")]
     public float _newScentNodeInterval = 2;
-    public Coroutine newScentCo;
+    public float _newWanderNodeInterval = 5;
+    // public Coroutine newScentCo;
+    private SphereCollider _detectionCollider;
+    public float _minWanderNodeDistance = 50f;
+    public float _maxWanderNodeDistance = 100f;
+    public float _minPlayerScentNodeDistance = 20f;
+    public float _maxPlayerScentNodeDistance = 50f;
+    [Range(10, 100000)] public float maxVelocity = 1000f;
+
+
 
     [System.Serializable]
     public struct Reward
@@ -65,39 +71,49 @@ public abstract class EnemyBase : MonoBehaviour, IPoolable
     public List<Reward> Rewards = new List<Reward>();
 
 
+
+
+
     [Header("Attacks")]
     public List<AttackDataBase> AvailableAttacks = new List<AttackDataBase>();
     public bool IsAttacking { get; set; } = false;
     public bool CanAttack { get; set; } = true;
-    public float _timeBeforeAttackMin;
-    public float _timeBeforeAttackMax;
-
-    [SerializeField] private float _castTimeMin;
-    [SerializeField] private float _castTimeMax;
-    public float CastTime;
-
     [SerializeField] private float _coolDownMin;
     [SerializeField] private float _coolDownMax;
     public float CoolDown;
+    public int AttackCost = 1;
 
 
 
     [Header("Sight")]
-    public float sightRadius = 10f;       // How far the enemy can see
+    public float sightRange = 10f;       // How far the enemy can see
     public float visionWidth = 1f;        // Radius of the "vision cone" (sphere)
     // public LayerMask detectionMask;       // What the enemy can see (e.g., Player layer)
     public GameObject gameObjectInView;
 
 
     [Header("Runtime Debug")]
-    public Transform target;
-    public GameObject _currentWanderNode;
-    public Transform _currentScentNode;
+    public Vector3 target;
+    public Vector3 _currentWanderNode;
+    public Vector3 _currentScentNode;
     public bool CanSeePlayer;
+    public int rayCount = 12;
+    public float rayLength = 10f;
+    public LayerMask hitLayers;
+    public Gradient normalColor;
+    public Gradient hitColor;
+    public float hitForce = 10f;
+    private LineRenderer[] lineRenderers;
+    public Vector3 avoidanceForce;
+    public float seekStateDetectionRadiusMultiplier = .8f;
+
+
 
     [Header("UI")]
     [SerializeField] private GameObject healthBarPrefab;
     public EnemyHealthUI healthUI;
+
+
 
     [Header("Health")] // TODO : Move to Stats Class
     public int MaxHealth;
@@ -105,35 +121,208 @@ public abstract class EnemyBase : MonoBehaviour, IPoolable
 
 
 
-
-    protected virtual void Awake()
+    public enum EnemyState
     {
-        _agent = GetComponent<NavMeshAgent>();
-        // Let physics handle movement
-        _agent.updatePosition = false;
-        _agent.updateRotation = false;
+        Wander,
+        Seek,
+        Attack,
+        Reposition,
+        Dead
     }
+
+
+    void Start()
+    {
+        CreateEntityDetection();
+        StartCoroutine(RandomizeMovement());
+        sightRange = Random.Range(sightRange - 10, sightRange + 15f);
+    }
+
+
 
     private void Update()
     {
         if (!IsSetup) return;
         CanSeePlayer = CanEnemySeePlayer();
+        target = GetCurrentTargetPosition();
 
-        if (Spawner) planetOrigin = Spawner.planet;
+        // if (Spawner) planetOrigin = Spawner.planet;
+
+        // make it so that if the enemy has a current scent node, it will always create a line following it
+        // that can be seen in the game view by using a line renderer but only make it last for a frame
+        CreateMovementDebug();
+
     }
+
+
 
     protected virtual void FixedUpdate()
     {
         if (!IsSetup) return;
         HandleState();
-
-        // Continuously update path if target moves
-        // if (target != null && _agent != null && _agent.isOnNavMesh && _currentState != EnemyState.Wander && !IsAttacking)
-        //     _agent.SetDestination(target.position);
-
-        // Use physics to move the enemy
         UsePhysicsToMove();
+        HandleEntityDetection();
     }
+
+
+
+
+    // Debugging ------------------------------------------------------------------------------------------
+    public void CreateMovementDebug()
+    {
+        if (!EnemyManager.Instance.ShowEnemyDebugRays)
+        {
+            return;
+        }
+
+
+        // if in seek mode show enemy sightLength as a line renderer
+        if (_currentState == EnemyState.Seek)
+        {
+            GameObject lineObject = new GameObject("Enemy Sight Line");
+            lineObject.transform.parent = transform;
+            LineRenderer lineRenderer = lineObject.AddComponent<LineRenderer>();
+            lineRenderer.startWidth = 0.2f;
+            lineRenderer.endWidth = 0.2f;
+            lineRenderer.positionCount = 2;
+            lineRenderer.SetPosition(0, transform.position);
+            lineRenderer.SetPosition(1, transform.position + transform.forward * sightRange);
+            lineRenderer.material = new Material(Shader.Find("Sprites/Default"));
+            lineRenderer.startColor = Color.yellow;
+            lineRenderer.endColor = Color.yellow;
+            Destroy(lineObject, .1f); // Destroy after a frame
+        }
+
+
+
+        if (_currentState == EnemyState.Seek)
+        {
+            // Create a line connecting the enemy to the new scent node
+            GameObject lineObject = new GameObject("Player Scent Node Line");
+            lineObject.transform.parent = transform;
+            LineRenderer lineRenderer = lineObject.AddComponent<LineRenderer>();
+            lineRenderer.startWidth = 0.2f;
+            lineRenderer.endWidth = 0.2f;
+            lineRenderer.positionCount = 2;
+            lineRenderer.SetPosition(0, transform.position);
+            lineRenderer.SetPosition(1, _currentScentNode);
+            lineRenderer.material = new Material(Shader.Find("Sprites/Default"));
+            lineRenderer.startColor = Color.blue;
+            lineRenderer.endColor = Color.blue;
+            Destroy(lineObject, .1f); // Destroy after a frame
+        }
+
+        
+
+        if (_currentState == EnemyState.Wander)
+        {
+            // Create a line connecting the enemy to the new scent node
+            GameObject lineObject = new GameObject("Wander Node Line");
+            lineObject.transform.parent = transform;
+            LineRenderer lineRenderer = lineObject.AddComponent<LineRenderer>();
+            lineRenderer.startWidth = 0.4f;
+            lineRenderer.endWidth = 0.4f;
+            lineRenderer.positionCount = 2;
+            lineRenderer.SetPosition(0, transform.position);
+            lineRenderer.SetPosition(1, _currentWanderNode);
+            lineRenderer.material = new Material(Shader.Find("Sprites/Default"));
+            lineRenderer.startColor = Color.magenta;
+            lineRenderer.endColor = Color.magenta;
+            Destroy(lineObject, .1f); // Destroy after a frame
+        }
+    }
+
+
+    public void CreateEntityDetection()
+    {
+        // Setup LineRenderers
+        lineRenderers = new LineRenderer[rayCount];
+        for (int i = 0; i < rayCount; i++)
+        {
+            GameObject lrObj = new GameObject("Ray_" + i);
+            lrObj.transform.parent = transform;
+            LineRenderer lr = lrObj.AddComponent<LineRenderer>();
+
+            lr.positionCount = 2;
+            lr.startWidth = 0.4f;
+            lr.endWidth = 0.4f;
+            lr.material = new Material(Shader.Find("Sprites/Default")); // simple shader
+            lr.colorGradient = normalColor;
+
+            lineRenderers[i] = lr;
+        }
+
+        rayLength = Random.Range(rayLength, rayLength * 1.5f);
+    }
+
+
+    public void HandleEntityDetection()
+    {
+        if (!EnemyManager.Instance.ShowEnemyDebugRays)
+        {
+            foreach (var lr in lineRenderers)
+            {
+                lr.enabled = false;
+            }
+        }
+        else
+        {
+            foreach (var lr in lineRenderers)
+            {
+                lr.enabled = true;
+            }
+        }
+
+        float tempRayLength = _currentState == EnemyState.Seek ? rayLength * seekStateDetectionRadiusMultiplier : rayLength;
+
+        float angleStep = 360f / rayCount;
+
+        for (int i = 0; i < rayCount; i++)
+        {
+            float angle = i * angleStep * Mathf.Deg2Rad;
+
+            // Direction in XZ plane
+            Vector3 dir = new Vector3(Mathf.Cos(angle), 0f, Mathf.Sin(angle));
+
+            // Ray start & end
+            Vector3 start = transform.position;
+            Vector3 end = start + dir * tempRayLength;
+
+            if (Physics.Raycast(start, dir, out RaycastHit hit, tempRayLength, hitLayers))
+            {
+                // Update line to stop at hit point
+                end = hit.point;
+                lineRenderers[i].colorGradient = hitColor;
+
+                // Apply force (if object has rigidbody)
+                Rigidbody rb = hit.collider.attachedRigidbody;
+                if (rb != null)
+                {
+                    Vector3 enemyPos = transform.position;
+                    Vector3 hitPos = hit.point;
+
+                    float distance = Vector3.Distance(enemyPos, hitPos);
+
+                    // Calculate a force that pushes away from the hit point
+                    Vector3 pushDirection = (enemyPos - hitPos).normalized;
+                    float pushForce = (tempRayLength - distance) / tempRayLength * hitForce; // Stronger force when closer
+                    avoidanceForce = pushDirection * pushForce;
+                    // Debug.Log($"Ray {i} hit {hit.collider.name} at distance {hit.distance} applying avoidance force {avoidanceForce} Push Direction {pushDirection} Push Force {pushForce}");
+                }
+            }
+            else
+            {
+                lineRenderers[i].colorGradient = normalColor;
+            }
+
+            // Update line positions
+            lineRenderers[i].SetPosition(0, start);
+            lineRenderers[i].SetPosition(1, end);
+        }
+    }
+
+
+
 
 
 
@@ -141,13 +330,10 @@ public abstract class EnemyBase : MonoBehaviour, IPoolable
 
 
     // Pooling | Instantiate Logic ------------------------------------------------------------------------
-
     public virtual void Setup(int worldTier, Transform playerTarget, EnemySpawner spawner, bool DebugMode = false)
     {
-        gameObject.name = "Testing 1";
         if (IsSetup) return;
 
-        gameObject.name = "Testing  === Winner";
         if (DebugMode)
         {
             Spawner = spawner;
@@ -158,63 +344,61 @@ public abstract class EnemyBase : MonoBehaviour, IPoolable
             return;
         }
 
-        // randomize some of the agent properties so there is some variation in the enemy movement
-        _agent.speed = Random.Range(minSpeed, maxSpeed);
-        _agent.stoppingDistance = Random.Range(_stoppingDistance, _stoppingDistance + 5);
-        _agent.acceleration = Random.Range(_baseAcceleration, _baseAcceleration + 60);
-        _agent.radius = Random.Range(_avoidanceRadius, _avoidanceRadius + 1);
         Spawner = spawner;
-        CanRotate = true;
-
 
 
         // set other stuff
         _rb = GetComponent<Rigidbody>();
-        _wanderNodeCloseRange = Random.Range(_wanderNodeCloseRange, _wanderNodeCloseRange + 2);
-        _attackRange += _agent.stoppingDistance;
-        _stoppingDistance = _agent.stoppingDistance;
-        _attackRange = Random.Range(_attackRange, _attackRange + 20);
+        // _attackRange = Random.Range(_attackRange, _attackRange + 20);
         _lookAtSpeed = Random.Range(_lookAtSpeed, _lookAtSpeed + 10f);
-        target = playerTarget;
         _currentState = EnemyState.Wander;
-        gameObject.name = gameObject.name + Random.Range(1f, 4f) + "";
+        gameObject.name = gameObject.name + " " + Random.Range(1, 20);
         _newScentNodeInterval = Random.Range(_newScentNodeInterval, _newScentNodeInterval + 3);
-        CastTime = Random.Range(_castTimeMin, _castTimeMax);
+        // CastTime = Random.Range(_castTimeMin, _castTimeMax);
         CoolDown = Random.Range(_coolDownMin, _coolDownMax);
+        _speed = Random.Range(minSpeed, maxSpeed);
 
 
+        _detectionCollider = GlobalDataStore.Instance.PlanetCollider;
 
         // Requirements to enter Wander state initially
-        _currentWanderNode = Spawner.GetRandomWanderNodePosition();
-        _agent.SetDestination(_currentWanderNode.transform.position);
-        if (newScentCo == null) newScentCo = StartCoroutine(GetRandomScentNode());
-
+        _currentWanderNode = RandomPointInCircle();
 
         // Setup Health
         CurrentHealth = MaxHealth;
-
 
         // Setup UI
         CreateHealthUI();
 
         IsSetup = true;
+
+        // Start generating new nodes
+        StartCoroutine(GenerateNewNodes());
     }
 
     public virtual void OnSpawned()
     {
-        if (_agent == null) _agent = GetComponent<NavMeshAgent>();
-        _agent.enabled = true;
         gameObject.SetActive(true);
         if (healthUI) healthUI.gameObject.SetActive(true);
     }
 
     public virtual void OnDespawned()
     {
-        _agent.enabled = false;
         _currentState = EnemyState.Wander;
         if (healthUI) healthUI.gameObject.SetActive(false);
     }
 
+
+
+
+
+
+
+
+
+
+
+    // Health & Damage Logic ------------------------------------------------------------------------------
 
     void CreateHealthUI()
     {
@@ -257,6 +441,13 @@ public abstract class EnemyBase : MonoBehaviour, IPoolable
 
 
 
+
+
+
+
+
+
+
     // AI Navigation State Logic ------------------------------------------------------------------------------
     protected virtual void HandleState()
     {
@@ -276,107 +467,77 @@ public abstract class EnemyBase : MonoBehaviour, IPoolable
 
 
 
+
+
+
+
+    // Wander State Logic ------------------------------------
     protected virtual void Wander()
     {
-        _agent.stoppingDistance = 1f;
-        _agent.updateRotation = true;
+        RotateTowards(_currentWanderNode);
 
-        // This will cause the enemy to choose a random wander Node and move there
-        // until the player is within its range.
-        if (Vector3.Distance(transform.position, _agent.destination) <= _wanderNodeCloseRange)
+        // animation
+        if (floatTween == null) StartFloatingAnimation();
+
+        // SWITCH TO SEEK
+        if (Spawner.isPlayerInZone)
         {
-            _currentWanderNode = Spawner.GetRandomWanderNodePosition();
-            target = _currentWanderNode.transform;
-            _agent.SetDestination(_currentWanderNode.transform.position);
-        }
-
-
-        if (GlobalDataStore.Instance.PlanetDetector.CurrentPlanetObject != null)
-        {
-            _currentScentNode = EnemyManager.Instance.GetRandomPlayerScentNode(); 
-            target = _currentWanderNode.transform;
             _currentState = EnemyState.Seek;
+            PlaySeekAnimation();
+            _currentScentNode = GetRandomPositionAroundPlayer();
+            return;
         }
     }
 
+
+
+
+
+
+
+
+
+
+    // Seek State Logic --------------------------------------
 
     protected virtual void Seek()
     {
         RotateTowards(GlobalDataStore.Instance.Player.transform.position);
-        _agent.updateRotation = false;
-        _agent.stoppingDistance = _stoppingDistance;
-        target = GlobalDataStore.Instance.Player.transform;
 
         // SWITCH TO WANDER
-        if (target == null)
+        if (!Spawner.isPlayerInZone)
         {
+            // Wait a few seconds before switching to wander
+            StartCoroutine(FlipBoolAfterTime(Random.Range(3f, 5f), Spawner.isPlayerInZone));
             _currentState = EnemyState.Wander;
             return;
         }
 
+
         // SWITCH TO ATTACK
-        if (IsPlayerInAttackRangeOfPlayer())
+        if (CanEnemySeePlayer() && IsPlayerInAttackRangeOfPlayer() && !IsAttacking && CanAttack)
         {
-            _currentState = EnemyState.Attack;
-            return;
+            if (!EnemyManager.Instance.TryToAttack(AttackCost)) return;
+            // _currentState = EnemyState.Attack;
+            IsAttacking = true;
+            StartCoroutine(InitializeAttack());
         }
-
-        if (_agent && _agent.isOnNavMesh) _agent.SetDestination(_currentScentNode.transform.position);
     }
 
 
-    public void UsePhysicsToMove()
-    {
-        if (_agent.pathPending || _agent.remainingDistance <= _agent.stoppingDistance)
-            return;
-
-        // Get direction toward next NavMesh corner
-        Vector3 dir = (_agent.steeringTarget - transform.position).normalized;
-
-        // Apply physics movement
-        _rb.AddForce(dir * _agent.speed, ForceMode.Acceleration);
-
-        // Limit max speed
-        if (_rb.linearVelocity.magnitude > maxSpeed)
-            _rb.linearVelocity = _rb.linearVelocity.normalized * maxSpeed;
-
-        // Rotate toward movement
-        // if (dir.sqrMagnitude > 0.01f)
-        // {
-        //     Quaternion lookRot = Quaternion.LookRotation(dir);
-        //     _rb.MoveRotation(Quaternion.Slerp(_rb.rotation, lookRot, Time.fixedDeltaTime * 5f));
-        // }
-    }
-    
 
 
 
 
 
-    // Attack State Logic --------------------------------------------------------------------------------
+
+
+    // Attack State Logic -------------------------------
 
     protected virtual void Attack()
     {
-        RotateTowards(GlobalDataStore.Instance.Player.transform.position);
-        _agent.updateRotation = false;
-
-
-        if (!IsPlayerInAttackRangeOfPlayer())
-        {
-            CanAttack = true;
-            IsAttacking = false;
-            _currentState = EnemyState.Seek;
-        }
-
-        // attack
-        if (CanAttack && !IsAttacking)
-        {
-            // StartCoroutine(InitializeAttack());
-            Debug.Log($"{gameObject.name} is starting an attack.");
-        }
-
-
-        if (!IsAttacking) _agent.SetDestination(_currentScentNode.transform.position);
+        // RotateTowards(GlobalDataStore.Instance.Player.transform.position);
+        // if (CanAttack) StartCoroutine(InitializeAttack());
     }
 
 
@@ -384,23 +545,29 @@ public abstract class EnemyBase : MonoBehaviour, IPoolable
     public IEnumerator InitializeAttack()
     {
         CanAttack = false;
-        IsAttacking = true;
-
-        SetCanMove(false);
-
 
         AttackDataBase randomAttack = AvailableAttacks[Random.Range(0, AvailableAttacks.Count)];
         if (randomAttack == null) yield break;
 
-        yield return new WaitForSeconds(Random.Range(_timeBeforeAttackMin, _timeBeforeAttackMax)
-            + CastTime);
 
+        // yield return PlayAttackAnimation();
 
         yield return StartCoroutine(randomAttack.Execute(this));
-        SetCanMove(true);
+
+        // wait a bit after attack
+        yield return new WaitForSeconds(.8f);
+
+        // _currentState = EnemyState.Seek;
+        EnemyManager.Instance.EnemyFinishedAttack(AttackCost);
+        IsAttacking = false;
 
         yield return new WaitForSeconds(CoolDown);
+        CanAttack = true;
     }
+
+
+
+
 
 
 
@@ -410,25 +577,27 @@ public abstract class EnemyBase : MonoBehaviour, IPoolable
 
     // HELPERS ------------------------------------------------------------------------------------------
 
-    protected bool IsPlayerInRange(float range)
+    protected bool IsPlayerTooClose(float range)
     {
-        return target && Vector3.Distance(transform.position, target.position) <= range;
+        return Vector3.Distance(transform.position, target) <= range;
     }
 
 
 
     private bool IsPlayerInAttackRangeOfPlayer()
     {
-        return Vector3.Distance(transform.position, target.position) <= _attackRange;
+        return Vector3.Distance(transform.position, target) <= sightRange;
     }
+
 
 
     private void RotateTowards(Vector3 targetDirection)
     {
-
-        Quaternion targetRotation = Quaternion.LookRotation((GlobalDataStore.Instance.Player.transform.position - transform.position).normalized);
-        transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * _lookAtSpeed);
+        float finalSpeed = _currentState == EnemyState.Wander ? _lookAtSpeed * .5f : _lookAtSpeed;
+        Quaternion targetRotation = Quaternion.LookRotation((targetDirection - transform.position).normalized);
+        transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * finalSpeed);
     }
+
 
 
     private bool CanEnemySeePlayer()
@@ -441,8 +610,7 @@ public abstract class EnemyBase : MonoBehaviour, IPoolable
             radius: visionWidth,
             direction: transform.forward,
             hitInfo: out hit,
-            maxDistance: sightRadius
-        // layerMask: detectionMask
+            maxDistance: sightRange
         );
 
         if (hitSomething)
@@ -450,65 +618,204 @@ public abstract class EnemyBase : MonoBehaviour, IPoolable
             if (hit.collider.gameObject.CompareTag("Player"))
             {
                 gameObjectInView = hit.collider.gameObject;
+                CanSeePlayer = true;
                 return true;
             }
+
+            CanSeePlayer = false;
         }
 
         return false;
     }
 
-    public void SetCanMove(bool canMove)
+
+
+    private IEnumerator RandomizeMovement()
     {
-        if (_agent != null && _agent.isOnNavMesh)
+        while (enabled)
         {
-            _agent.isStopped = !canMove;
-            _agent.updatePosition = canMove;
-            _agent.updateRotation = canMove;
+            if (_currentState == EnemyState.Wander)
+            {
+                // New Speed
+                _speed = Random.Range(minSpeed, maxSpeed);
+            }
+
+            yield return new WaitForSeconds(Random.Range(3f, 7f));
+        }
+    }
+
+
+    public IEnumerator FlipBoolAfterTime(float time, bool boolean)
+    {
+        yield return new WaitForSeconds(time);
+        boolean = !boolean;
+    }
+
+
+
+
+
+
+
+
+
+
+    // Nodes ------------------------------------------------------------------------------------------
+    public Vector3 RandomPointInCircle()
+    {
+        Vector3 center = _detectionCollider.transform.TransformPoint(_detectionCollider.center);
+
+        float angle = Random.Range(0f, Mathf.PI * 2f);
+
+        // pick distance inside [min, max]
+        float distance = Random.Range(_minWanderNodeDistance, _maxWanderNodeDistance);
+
+        float x = Mathf.Cos(angle) * distance;
+        float z = Mathf.Sin(angle) * distance;
+
+        return new Vector3(center.x + x, center.y, center.z + z);
+    }
+
+
+
+    private IEnumerator GenerateNewNodes()
+    {
+        while (enabled)
+        {
+            if (_currentState == EnemyState.Wander)
+            {
+                float random = Random.Range(_newWanderNodeInterval, _newWanderNodeInterval + 5);
+                yield return new WaitForSeconds(random);
+
+                // Debug.Log("Getting new wander node");
+                // Current Scent Node
+                _currentWanderNode = RandomPointInCircle();
+
+                // Create a sphere at the new scent node position
+                GameObject sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+                sphere.GetComponent<Collider>().enabled = false; // Disable collider
+                sphere.transform.position = _currentWanderNode;
+                sphere.transform.localScale = Vector3.one * 3f; // Adjust size as needed
+                sphere.GetComponent<Renderer>().material.color = Color.blue; // Set color to red for visibility
+                if (!EnemyManager.Instance.ShowEnemyDebugRays)
+                {
+                    // hide the sphere if debug rays are not on
+                    Destroy(sphere);
+                    continue;
+                }
+
+                Destroy(sphere, random);
+            }
+            else
+            {
+                float random = Random.Range(_newScentNodeInterval, _newScentNodeInterval + 5);
+                yield return new WaitForSeconds(random);
+
+                // Debug.Log("Getting new scent node");
+                // Current Scent Node
+                _currentScentNode = GetRandomPositionAroundPlayer();
+
+                // Create a sphere at the new scent node position
+                GameObject sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+                sphere.GetComponent<Collider>().enabled = false; // Disable collider
+                sphere.transform.position = _currentScentNode;
+                sphere.transform.localScale = Vector3.one * 3f; // Adjust size as needed
+                sphere.GetComponent<Renderer>().material.color = Color.blue; // Set color to red for visibility
+                if (!EnemyManager.Instance.ShowEnemyDebugRays)
+                {
+                    // hide the sphere if debug rays are not on
+                    Destroy(sphere);
+                    continue;
+                }
+                Destroy(sphere, random);
+            }
         }
     }
 
 
 
-    protected Vector3 GetRandomNavPoint(Vector3 center, float radius)
+    public Vector3 GetRandomPositionAroundPlayer()
     {
-        for (int i = 0; i < 10; i++)
-        {
-            Vector3 randomPos = center + Random.insideUnitSphere * radius;
-            randomPos.y = 100f;
-            if (NavMesh.SamplePosition(randomPos, out NavMeshHit hit, 200f, NavMesh.AllAreas))
-                return hit.position;
-        }
+        // Pick a random angle in radians
+        float angle = Random.Range(0f, Mathf.PI * 2f);
 
-        return center;
+        // Convert angle to a direction vector on the XZ plane
+        Vector3 direction = new Vector3(Mathf.Cos(angle), 0f, Mathf.Sin(angle));
+
+        // Offset by distance
+        return GlobalDataStore.Instance.Player.transform.position + direction * Random.Range(_minPlayerScentNodeDistance, _maxPlayerScentNodeDistance);
     }
 
 
 
 
-    private IEnumerator GetRandomScentNode()
+
+
+
+
+
+
+    // Movement ------------------------------------------------------------------------------------------
+
+    // use new variable to control physics movement force
+    // 
+    public float wanderTooCloseDistance = 5f;
+    public float seekTooCloseDistance = 3f;
+    public void UsePhysicsToMove()
     {
-        while (true)
+        if (_currentState == EnemyState.Dead || IsAttacking) return;
+        // Player Scent Node
+        float currentSpeed = (_currentState == EnemyState.Seek) ? _speed * _SeekSpeedMultiplier : _speed;
+        Vector3 dir = (_currentState == EnemyState.Wander) ? (_currentWanderNode - transform.position).normalized : (_currentScentNode - transform.position).normalized;
+
+
+        // only apply the dir force if the enemy is not too close to either node
+        Vector3 whichNode = (_currentState == EnemyState.Wander) ? _currentWanderNode : _currentScentNode;
+        float tooCloseDistance = (_currentState == EnemyState.Wander) ? wanderTooCloseDistance : seekTooCloseDistance;
+
+        // movement to node force
+        // if (Vector3.Distance(transform.position, whichNode) < tooCloseDistance)
+        _rb.AddForce(dir * currentSpeed, ForceMode.Force);
+
+        // avoidance force from raycasting
+        _rb.AddForce(avoidanceForce, ForceMode.Force);
+
+
+        // Limit max speed
+        if (_rb.linearVelocity.magnitude > maxVelocity)
+            _rb.linearVelocity = maxVelocity * _rb.linearVelocity.normalized;
+    }
+
+
+
+
+    public Vector3 GetCurrentTargetPosition()
+    {
+        if (_currentState == EnemyState.Wander)
         {
-            yield return new WaitForSeconds(_newScentNodeInterval);
-
-            // Current Scent Node
-            ScentNode oldNode = _currentScentNode == null ? null : _currentScentNode.gameObject.GetComponent<ScentNode>();
-            _currentScentNode = EnemyManager.Instance.GetRandomPlayerScentNode(oldNode);
-
-            // New Speed
-            _agent.speed = Random.Range(minSpeed, maxSpeed);
-
-
+            return _currentWanderNode;
+        }
+        else
+        {
+            return _currentScentNode;
         }
     }
 
+
+
+
+
+
+
+
+
+
+    // Death & Rewards -----------------------------------------------------------------------------------
 
     public void InitiateDeath()
     {
-        CanRotate = false;
         Debug.Log($"{gameObject.name} has died.");
         _currentState = EnemyState.Dead;
-        _agent.enabled = false;
         ExplosionManager.Instance.CreateExplosion(gameObject.transform.position, ExplosionManager.ExplosionType.SMALL);
         gameObject.SetActive(false);
         IsSetup = false;
@@ -531,12 +838,43 @@ public abstract class EnemyBase : MonoBehaviour, IPoolable
 
 
 
-    public enum EnemyState
+
+
+
+
+
+
+
+
+
+
+    // Animation Events -----------------------------------------------------------------------------------
+    private Tween floatTween;
+
+    public void StartFloatingAnimation()
     {
-        Wander,
-        Seek,
-        Attack,
-        Reposition,
-        Dead
+        float finalSpeed = _currentState == EnemyState.Wander ? Random.Range(1f, 2f) : Random.Range(.3f, .5f);
+        floatTween = transform.DOMoveY(transform.position.y + Random.Range(0.5f, 1), finalSpeed)
+            .SetLoops(-1, LoopType.Yoyo)
+            .SetEase(Ease.InOutSine);
+    }
+
+
+    public void PlaySeekAnimation()
+    {
+        // When the enemy goes from wander to seek, make it do a quick hop up and down
+        transform.DOPunchPosition(Vector3.up * 1.2f, Random.Range(.6f, 1f), 10, 1);
+
+        // make their material 
+    }
+
+    public IEnumerator PlayAttackAnimation()
+    {
+        // Make the enemy slowly back up a little then lunge forward quickly, then move back to original position
+        Sequence attackSeq = DOTween.Sequence();
+        float backUpDistance = Random.Range(.01f, .015f);
+        attackSeq.Append(transform.DOPunchPosition(-Vector3.forward * backUpDistance, Random.Range(1.5f, 1.5f), 10, 1));
+        attackSeq.Play();
+        yield return attackSeq.WaitForCompletion();
     }
 }

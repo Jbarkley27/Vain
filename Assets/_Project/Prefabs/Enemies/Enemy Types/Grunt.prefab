@@ -402,7 +402,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: a2b59ae465a464128aa5d37bcc7a4637, type: 2}
+  - {fileID: 2100000, guid: 419f86a6126f545b983de0e1039e242d, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -714,6 +714,7 @@ GameObject:
   - component: {fileID: 3819008030960564607}
   - component: {fileID: 7306853784618024514}
   - component: {fileID: 5458674319741837338}
+  - component: {fileID: 2287702188587583532}
   m_Layer: 0
   m_Name: Visual
   m_TagString: Untagged
@@ -770,6 +771,28 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a8bbe9f747beb4eee913a68002cf4f44, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!95 &2287702188587583532
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5661649231556783211}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: a8aa3f1c0943c47fe9a2c653720c507b, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &7890397609005815511
 GameObject:
   m_ObjectHideFlags: 0
@@ -785,13 +808,13 @@ GameObject:
   - component: {fileID: 6833046797504528415}
   - component: {fileID: 3086775886318432129}
   - component: {fileID: 351188836386347251}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Grunt
   m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &2028010634375123559
 Transform:
   m_ObjectHideFlags: 0
@@ -826,20 +849,20 @@ MonoBehaviour:
   _rb: {fileID: 9098130642266119595}
   IsSetup: 0
   Spawner: {fileID: 0}
-  CanRotate: 1
-  planetOrigin: {fileID: 0}
   statusEffectEnemyManager: {fileID: 3086775886318432129}
   meshFlashEffect: {fileID: 5458674319741837338}
-  visual: {fileID: 5661649231556783211}
-  _attackRange: 10
-  _lookAtSpeed: 5
-  _wanderNodeCloseRange: 10
-  _stoppingDistance: 1
-  _avoidanceRadius: 4
-  _baseAcceleration: 5
-  minSpeed: 100
-  maxSpeed: 150
-  _newScentNodeInterval: 4
+  _lookAtSpeed: 2
+  minSpeed: 4000
+  maxSpeed: 5000
+  _speed: 0
+  _SeekSpeedMultiplier: 1.5
+  _newScentNodeInterval: 1.5
+  _newWanderNodeInterval: 2
+  _minWanderNodeDistance: 40
+  _maxWanderNodeDistance: 400
+  _minPlayerScentNodeDistance: 50
+  _maxPlayerScentNodeDistance: 80
+  maxVelocity: 1400
   Rewards:
   - resourceType: 0
     amount: 4
@@ -849,25 +872,91 @@ MonoBehaviour:
     amount: 2
   AvailableAttacks:
   - {fileID: 11400000, guid: 2e3a324e51f45449187911ab1e5db827, type: 2}
-  _timeBeforeAttackMin: 1
-  _timeBeforeAttackMax: 4
-  _castTimeMin: 0.5
-  _castTimeMax: 2
-  CastTime: 0
-  _coolDownMin: 3
-  _coolDownMax: 8
+  _coolDownMin: 4
+  _coolDownMax: 7
   CoolDown: 0
-  sightRadius: 10
+  AttackCost: 1
+  sightRange: 90
   visionWidth: 3
   gameObjectInView: {fileID: 0}
-  target: {fileID: 0}
-  _currentWanderNode: {fileID: 0}
-  _currentScentNode: {fileID: 0}
+  target: {x: 0, y: 0, z: 0}
+  _currentWanderNode: {x: 0, y: 0, z: 0}
+  _currentScentNode: {x: 0, y: 0, z: 0}
   CanSeePlayer: 0
+  rayCount: 14
+  rayLength: 60
+  hitLayers:
+    serializedVersion: 2
+    m_Bits: 1152
+  normalColor:
+    serializedVersion: 2
+    key0: {r: 0.9245283, g: 0.082858644, b: 0.082858644, a: 0.19607843}
+    key1: {r: 1, g: 0, b: 0, a: 0.19607843}
+    key2: {r: 0, g: 0, b: 0, a: 0}
+    key3: {r: 0, g: 0, b: 0, a: 0}
+    key4: {r: 0, g: 0, b: 0, a: 0}
+    key5: {r: 0, g: 0, b: 0, a: 0}
+    key6: {r: 0, g: 0, b: 0, a: 0}
+    key7: {r: 0, g: 0, b: 0, a: 0}
+    ctime0: 0
+    ctime1: 65535
+    ctime2: 0
+    ctime3: 0
+    ctime4: 0
+    ctime5: 0
+    ctime6: 0
+    ctime7: 0
+    atime0: 0
+    atime1: 65535
+    atime2: 0
+    atime3: 0
+    atime4: 0
+    atime5: 0
+    atime6: 0
+    atime7: 0
+    m_Mode: 0
+    m_ColorSpace: -1
+    m_NumColorKeys: 2
+    m_NumAlphaKeys: 2
+  hitColor:
+    serializedVersion: 2
+    key0: {r: 1, g: 1, b: 1, a: 0.39215687}
+    key1: {r: 1, g: 1, b: 1, a: 0.39215687}
+    key2: {r: 0, g: 0, b: 0, a: 0}
+    key3: {r: 0, g: 0, b: 0, a: 0}
+    key4: {r: 0, g: 0, b: 0, a: 0}
+    key5: {r: 0, g: 0, b: 0, a: 0}
+    key6: {r: 0, g: 0, b: 0, a: 0}
+    key7: {r: 0, g: 0, b: 0, a: 0}
+    ctime0: 0
+    ctime1: 65535
+    ctime2: 0
+    ctime3: 0
+    ctime4: 0
+    ctime5: 0
+    ctime6: 0
+    ctime7: 0
+    atime0: 0
+    atime1: 65535
+    atime2: 0
+    atime3: 0
+    atime4: 0
+    atime5: 0
+    atime6: 0
+    atime7: 0
+    m_Mode: 0
+    m_ColorSpace: -1
+    m_NumColorKeys: 2
+    m_NumAlphaKeys: 2
+  hitForce: 7000
+  avoidanceForce: {x: 0, y: 0, z: 0}
+  seekStateDetectionRadiusMultiplier: 1
   healthBarPrefab: {fileID: 8069898613419892007, guid: 49ec16da15991486bb1d5161c694b5d6, type: 3}
   healthUI: {fileID: 0}
   MaxHealth: 40
   CurrentHealth: 0
+  wanderTooCloseDistance: 5
+  seekTooCloseDistance: 3
 --- !u!195 &2894944222097087603
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -875,7 +964,7 @@ NavMeshAgent:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7890397609005815511}
-  m_Enabled: 1
+  m_Enabled: 0
   m_AgentTypeID: 0
   m_Radius: 5
   m_Speed: 2
@@ -898,8 +987,8 @@ Rigidbody:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7890397609005815511}
   serializedVersion: 4
-  m_Mass: 40
-  m_Drag: 5
+  m_Mass: 30
+  m_Drag: 3
   m_AngularDrag: 5
   m_CenterOfMass: {x: 0, y: 0, z: 0}
   m_InertiaTensor: {x: 1, y: 1, z: 1}

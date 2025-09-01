@@ -10,10 +10,7 @@ public class RadialAttackData : AttackDataBase
     public float spreadAngle = 360f; // Total spread, centered on forward
     public float projectileForce = 50;
 
-    private void Update()
-    {
 
-    }
 
     public override IEnumerator Execute(EnemyBase enemy)
     {
@@ -28,9 +25,6 @@ public class RadialAttackData : AttackDataBase
         }
 
         // Disable enemy attack while firing
-        enemy.SetCanMove(false);
-
-
         float angleStep;
         float startAngle;
 
@@ -58,50 +52,13 @@ public class RadialAttackData : AttackDataBase
 
             yield return new WaitForSeconds(RateOfFire); // Optional delay
         }
-
-
-        // for (int i = 0; i < NumberOfProjectiles; i++)
-        // {
-        //     float currentAngle = startAngle + (angleStep * i);
-        //     Quaternion rotation = Quaternion.AngleAxis(currentAngle, Vector3.up);
-        //     Vector3 localDirection = rotation * Vector3.forward;
-
-        //     // Rotate the local direction by the GameObject's orientation
-        //     Vector3 worldDirection = enemy.gameObject.transform.rotation * localDirection;
-
-        //     // Instantiate and launch projectile
-        //     ProjectileBase mover = Instantiate(ProjectilePrefab, enemy.gameObject.transform.position, Quaternion.identity).GetComponent<ProjectileBase>();
-
-
-        //     if (mover != null)
-        //     {
-        //         mover.Initialize(worldDirection, BaseSpeed, speedCurve, Lifetime);
-        //     }
-
-        //     // angle += angleStep;
-        //     // yield return new WaitForSeconds(fireDelay);
-
-
-        //     // GameObject proj = Instantiate(ProjectilePrefab, enemy.gameObject.transform.position, Quaternion.LookRotation(direction));
-        //     // ProjectileBase mover = proj.GetComponent<ProjectileBase>();
-
-        //     // if (mover != null)
-        //     // {
-        //     //     mover.Initialize(direction, angle, speedCurve, Lifetime);
-        //     // }
-
-        //     yield return new WaitForSeconds(RateOfFire);
-        // }
-
-        enemy.CanAttack = true;
-        enemy.IsAttacking = false;
-        enemy.SetCanMove(true);
-
     }
 
     void FireProjectile(Vector3 direction, EnemyBase enemy)
     {
         ProjectileBase mover = Instantiate(ProjectilePrefab, enemy.gameObject.transform.position, Quaternion.identity).GetComponent<ProjectileBase>();
+
+        // mover.transform.localScale = new Vector3(.2f, .2f, .2f); // Scale down for grunt projectile
 
         if (mover != null)
         {

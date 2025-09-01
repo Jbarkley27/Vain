@@ -15,7 +15,7 @@ public class EnemySpawner : MonoBehaviour
     public Planet planet;
     public float despawnDelay = 10f;
     private Coroutine despawnCoroutine;
-    private bool isPlayerInZone = false;
+    public bool isPlayerInZone = false;
     private bool enemiesSpawned = false;
     public List<EnemyBase> activeEnemies = new List<EnemyBase>();
     public PlanetDetector planetDetector;
@@ -50,11 +50,6 @@ public class EnemySpawner : MonoBehaviour
             Debug.Log("Bypassing Debug Mode for now");
             // SpawnTestSubjects();
         }
-    }
-
-    public GameObject GetRandomWanderNodePosition()
-    {
-        return PlanetWanderNodes[Random.Range(0, PlanetWanderNodes.Count)];
     }
 
     private void OnTriggerEnter(Collider other)

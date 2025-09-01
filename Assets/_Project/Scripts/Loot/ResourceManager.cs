@@ -2,6 +2,7 @@ using UnityEngine;
 using System.Collections.Generic;
 using DG.Tweening;
 using Random=UnityEngine.Random;
+using System.Collections;
 
 public class ResourceManager : MonoBehaviour
 {
@@ -56,18 +57,28 @@ public class ResourceManager : MonoBehaviour
             Rigidbody rb = resourceInstance.GetComponent<Rigidbody>();
             if (rb != null)
             {
-                Debug.Log("Successfully added Rigidbody to resource instance.");
-                resourceInstance.transform.DOMove(GetRandomPointAround(position, Random.Range(7f, 10f)), Random.Range(.4f, .9f))
-                    .SetEase(Ease.InSine)
-                    .OnComplete(() =>
-                    {
-                        
-                    });
+                StartCoroutine(FollowPlayer(Random.Range(7f, 10f)));
             }
         }
         else
         {
             Debug.LogError("Resource prefab not found for type: " + resourceType);
+        }
+    }
+
+
+    private IEnumerator FollowPlayer(float followSpeed)
+    {
+        Transform target = GlobalDataStore.Instance.Player.transform;
+
+        while (target != null)
+        {
+            transform.position = Vector3.MoveTowards(
+                transform.position,
+                target.position,
+                followSpeed * Time.deltaTime
+            );
+            yield return null; // wait until next frame
         }
     }
 

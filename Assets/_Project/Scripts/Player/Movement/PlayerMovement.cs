@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.AI;
 using UnityEngine.VFX;
 
 
@@ -12,6 +13,7 @@ public class PlayerMovement : MonoBehaviour
     [Header("General")]
     [SerializeField] private Rigidbody _rb;
     private InputManager _inputManager;
+    public NavMeshAgent _agent; // only used for enemy avoidance
 
 
     [Header("Rotate Settings")]
@@ -76,6 +78,15 @@ public class PlayerMovement : MonoBehaviour
     {
         HandleAnimations();
         HandleSpeedVFX();
+        // check if the player navmesh agent is on the navmesh
+        // if (_agent != null && !_agent.isOnNavMesh)
+        // {
+        //     Debug.LogWarning("Player NavMeshAgent is not on the NavMesh!");
+        // }
+        // else
+        // {
+        //     Debug.Log("Player NavMeshAgent is on the NavMesh.");
+        // }
     }
 
 

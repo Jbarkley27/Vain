@@ -24,4 +24,11 @@ public static class AudioLibrary
 
 
 
+
+    // SFX ------------------------------------------------------------------------
+
+    /// MISCELLANEOUS SFX
+    public static string Hover_Over_Enemy = "event:/SFX/UI/Hover_Over_Enemy";
+    public static string Unhover_Over_Enemy = "event:/SFX/UI/Unhover_Over_Enemy";
+
 }

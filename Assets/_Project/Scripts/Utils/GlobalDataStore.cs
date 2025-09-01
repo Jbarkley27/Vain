@@ -14,6 +14,8 @@ public class GlobalDataStore : MonoBehaviour
     public SpaceTimeSystem SpaceTimeSystem;
     public StarSystemManager StarSystemManager;
     public StarfieldColorManager StarfieldColorManager;
+    public SphereCollider PlanetCollider;
+    public Transform DebugParent;
 
     private void Awake()
     {

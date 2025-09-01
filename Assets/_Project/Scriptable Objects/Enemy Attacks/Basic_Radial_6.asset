@@ -14,8 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   AttackType: 0
   ProjectilePrefab: {fileID: 1478179651463956194, guid: d6171c1f9c77a4238ad50896c2e75488, type: 3}
-  Lifetime: 3
-  BaseSpeed: 40
+  Lifetime: 6
+  BaseSpeed: 200
   Damage: 4
   RateOfFire: 0
   NumberOfProjectiles: 4
@@ -44,4 +44,4 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 4
   spreadAngle: 360
-  projectileForce: 50
+  projectileForce: 200

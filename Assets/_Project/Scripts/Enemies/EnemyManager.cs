@@ -8,6 +8,9 @@ public class EnemyManager : MonoBehaviour
     public static EnemyManager Instance;
     public Transform playerScentNodeParent;
     public List<ScentNode> PlayerScentNodes;
+    public bool ShowEnemyDebugRays = true;
+    public int MaxEnemyAttackPoints = 3;
+    public int CurrentEnemyAttackPoints = 0;
 
 
     private void Awake()
@@ -38,20 +41,25 @@ public class EnemyManager : MonoBehaviour
 
 
 
-
-    public Transform GetRandomPlayerScentNode(ScentNode usedNode = null)
+    public bool attackLock = false;
+    public bool TryToAttack(int attackCost)
     {
-        for (int i = 0; i < PlayerScentNodes.Count; i++)
+        if (attackLock) return false;
+        attackLock = true;
+        if (CurrentEnemyAttackPoints + attackCost <= MaxEnemyAttackPoints)
         {
-            if (!PlayerScentNodes[i].IsTaken)
-            {
-                PlayerScentNodes[i].IsTaken = true;
-                return PlayerScentNodes[i].gameObject.transform;
-            }
+            CurrentEnemyAttackPoints += attackCost;
+            attackLock = false;
+            return true;
         }
 
-        if (usedNode) usedNode.IsTaken = false;
+        attackLock = false;
+        return false;
+    }
 
-        return PlayerScentNodes[Random.Range(0, PlayerScentNodes.Count)].transform;
+    public void EnemyFinishedAttack(int attackCost)
+    {
+        CurrentEnemyAttackPoints -= attackCost;
+        if (CurrentEnemyAttackPoints < 0) CurrentEnemyAttackPoints = 0;
     }
 }
