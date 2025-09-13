@@ -125,7 +125,7 @@ public class SpaceTimeSystem : MonoBehaviour
     // --- HUD Helpers ---
     public string GetTimeString()
     {
-        return $"VEIL | {currentYear}:{currentDay}:{currentMinute} | {GlobalDataStore.Instance.PlanetDetector.CurrentPlanet}";
+        return $"VEIL - {currentYear}.{currentDay}.{currentMinute} - {GlobalDataStore.Instance.PlanetDetector.CurrentPlanet}";
     }
 
     public float GetDayProgress()

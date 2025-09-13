@@ -3,6 +3,7 @@ using UnityEngine;
 public class StarSystemManager : MonoBehaviour
 {
     public SectorManager sectorManager;
+    public bool TravelingToPlanet = false;
 
     void Start()
     {
@@ -20,7 +21,8 @@ public class StarSystemManager : MonoBehaviour
             return;
         }
 
-        sectorManager.CreateOuterSector();
+        sectorManager.CreateAllSectors();
+        MapManager.Instance.CreateMap();
 
         GlobalDataStore.Instance.SpaceTimeSystem.StartAtZero();
 
@@ -36,8 +38,8 @@ public class StarSystemManager : MonoBehaviour
         }
 
         Debug.Log("Initiating Planetary Entry");
-        sectorManager.PlanetFormationBase.CreatePlanetarySystem(
-            sectorManager.OuterSectorPlanets[i]
-        );
+        // sectorManager.PlanetFormationBase.CreatePlanetarySystem(
+        //     sectorManager.OuterSectorPlanets[i]
+        // );
     }
 }

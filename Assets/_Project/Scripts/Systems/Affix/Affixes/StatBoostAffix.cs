@@ -18,7 +18,7 @@ public class StatBoostAffix : AffixBase
 
     public override void OnEquip()
     {
-        Debug.Log("Adding " + amount + " to " + stat.ToString());
+        // Debug.Log("Adding " + amount + " to " + stat.ToString());
         StatManager.Instance.UpdateStatValue(stat, amount);
     }
 

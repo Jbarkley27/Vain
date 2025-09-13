@@ -73,7 +73,7 @@ public class EnemyRaycaster : MonoBehaviour
                 Rigidbody rb = hit.collider.attachedRigidbody;
                 if (rb != null)
                 {
-                    Debug.Log($"Ray {i} hit {hit.collider.name} at distance {hit.distance} applying force {dir * hitForce} + Current Velocity {rb.linearVelocity}");
+                    // Debug.Log($"Ray {i} hit {hit.collider.name} at distance {hit.distance} applying force {dir * hitForce} + Current Velocity {rb.linearVelocity}");
                     // lets make it so that the force amount is based on how close the hit is
                     float distanceFactor = 1f - (hit.distance / rayLength) * hitForce;
                     distanceFactor = Mathf.Clamp(distanceFactor, 0f, hitForce);

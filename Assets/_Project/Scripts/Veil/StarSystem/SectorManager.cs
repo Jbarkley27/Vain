@@ -5,39 +5,29 @@ public class SectorManager : MonoBehaviour
 {
     public enum SectorType
     {
-        Center,
-        Inner,
-        Middle,
-        Outer
+        SECTOR_A,
+        SECTOR_B,
+        SECTOR_C,
+        SECTOR_D,
+        SECTOR_E,
     }
 
     public SectorType CurrentSector;
+
+    [System.Serializable]
+    public struct SectorData
+    {
+        public SectorType sectorType;
+        public int planetCount;
+        public List<Planet> possiblePlanets;
+        public List<Planet> generatedPlanets;
+    }
+
+
+
+    public List<SectorData> AllSectorData = new List<SectorData>();
     public GameObject SectorBounds;
     public PlanetFormationBase PlanetFormationBase;
-
-    [Header("Outer Sector")]
-    public int OuterSectorPlanetCount = 6;
-    public List<Planet> OuterSectorPossiblePlanets = new List<Planet>();
-    public List<Planet> OuterSectorPlanets = new List<Planet>();
-
-
-    // [Header("Middle Sector")]
-    // public int MiddleSectorPlanetCount = 7;
-    // public List<PlanetFormationData> SectorMiddlePossiblePlanetFormationDatas = new List<PlanetFormationData>();
-    // public List<Planet> MiddleSectorPossiblePlanets = new List<Planet>();
-    // public List<PlanetFormationData> GeneratedMiddleSectorPlanetFormationDatas = new List<PlanetFormationData>();
-
-
-
-    // [Header("Inner Sector")]
-    // public int InnerSectorPlanetCount = 8;
-    // public List<PlanetFormationData> SectorInnerPossiblePlanetFormationDatas = new List<PlanetFormationData>();
-    // public List<Planet> InnerSectorPossiblePlanets = new List<Planet>();
-    // public List<PlanetFormationData> GeneratedInnerSectorPlanetFormationDatas = new List<PlanetFormationData>();
-
-
-    // [Header("Center Sector")]
-    // public int CenterSectorPlanetCount = 1;
 
 
 
@@ -52,53 +42,42 @@ public class SectorManager : MonoBehaviour
         }
     }
 
-    public void CreateOuterSector()
+    public void CreateAllSectors()
     {
-        CurrentSector = SectorType.Outer;
-
-        Debug.Log("Creating Outer Sector");
-
-        // Get random planet formations for the outer sector
-        for (int i = 0; i < OuterSectorPlanetCount; i++)
+        GlobalDataStore.Instance.PlanetFormationBase.InitiateFormationFramework();
+        foreach (SectorData sectorData in AllSectorData)
         {
-            // Get a random formation from the possible formations list
-            Planet randomPlanet = OuterSectorPossiblePlanets[Random.Range(0, OuterSectorPossiblePlanets.Count)];
-
-            OuterSectorPossiblePlanets.Remove(randomPlanet);
-            OuterSectorPlanets.Add(randomPlanet);
-            Debug.Log($"Outer Sector Planet {i + 1}: {randomPlanet.Name}");
+            CreateSector(sectorData.sectorType);
         }
     }
 
-    public void CreateMiddleSector()
+
+    public void CreateSector(SectorType sectorType)
     {
-        CurrentSector = SectorType.Middle;
+        SectorData sectorData = AllSectorData.Find(s => s.sectorType == sectorType);
+        if (sectorData.possiblePlanets.Count == 0)
+        {
+            Debug.LogWarning($"No possible planets found for sector {sectorType}");
+            return;
+        }
 
-        Debug.Log("Creating Middle Sector");
-
-        // Logic to create the middle sector can be added here
-        // This could involve instantiating planet formations and setting up planets similar to the outer sector.
-    }
+        sectorData.generatedPlanets.Clear();
 
 
-    public void CreateInnerSector()
-    {
-        CurrentSector = SectorType.Inner;
+        for (int i = 0; i < sectorData.planetCount; i++)
+        {
+            int randomIndex = Random.Range(0, sectorData.possiblePlanets.Count);
+            Planet planetToAdd = sectorData.possiblePlanets[randomIndex];
+            Debug.Log("Initializing Planet " + planetToAdd.gameObject.name + " for " + sectorType);
+            planetToAdd.InitializePlanet(sectorType);
+            sectorData.generatedPlanets.Add(planetToAdd);
+            sectorData.possiblePlanets.Remove(planetToAdd);
+        }
 
-        Debug.Log("Creating Inner Sector");
+        if (sectorData.planetCount == sectorData.generatedPlanets.Count)
+        {
+            Debug.Log("All planets generated for " + sectorType);
+        }
 
-        // Logic to create the inner sector can be added here
-        // This could involve instantiating planet formations and setting up planets similar to the outer sector.
-    }
-    
-
-    public void CreateCenterSector()
-    {
-        CurrentSector = SectorType.Center;
-
-        Debug.Log("Creating Center Sector");
-
-        // Logic to create the center sector can be added here
-        // This could involve instantiating planet formations and setting up planets similar to the outer sector.
     }
 }

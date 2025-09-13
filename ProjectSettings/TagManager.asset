@@ -13,6 +13,7 @@ TagManager:
   - PlanetColorChange
   - TargetUI
   - Ground
+  - MapElement
   layers:
   - Default
   - TransparentFX

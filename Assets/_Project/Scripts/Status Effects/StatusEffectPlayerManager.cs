@@ -33,7 +33,7 @@ public class StatusEffectPlayerManager : MonoBehaviour
 
     void Start()
     {
-        StartCoroutine(ApplyPoison());
+        // StartCoroutine(ApplyPoison());
     }
 
 
@@ -88,7 +88,7 @@ public class StatusEffectPlayerManager : MonoBehaviour
             // check if that status effect is already applied
             if (AppliedStatuses[statusEffectType] != null)
             {
-                Debug.Log(statusEffectType + " is already applied");
+                // Debug.Log(statusEffectType + " is already applied");
                 return;
             }
 

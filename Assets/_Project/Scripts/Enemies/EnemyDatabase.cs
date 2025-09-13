@@ -19,7 +19,7 @@ public class EnemyDatabase : MonoBehaviour {
 
     void Start()
     {
-        Debug.Log(GetPrefab(EnemyID.Sniper).name);
+        // Debug.Log(GetPrefab(EnemyID.Sniper).name);
     }
 
     public GameObject GetPrefab(EnemyID id)

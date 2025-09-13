@@ -115,7 +115,7 @@ public class StatManager : MonoBehaviour
             }
         }
 
-        Debug.Log("No stat was found");
+        // Debug.Log("No stat was found");
     }
 
 

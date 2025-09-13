@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 
+
 public class PlanetFormationBase : MonoBehaviour
 {
     public Transform PlanetPlacement;
@@ -12,11 +13,12 @@ public class PlanetFormationBase : MonoBehaviour
     public List<GameObject> largePOIList;
     public Transform PlayerSpawnPosition;
     public Planet Planet = null;
+    public Vector3 EntryPoint;
 
 
     void Start()
     {
-        InitiateFormationFramework();
+        
     }
 
 

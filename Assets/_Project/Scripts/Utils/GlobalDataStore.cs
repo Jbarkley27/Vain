@@ -8,7 +8,7 @@ public class GlobalDataStore : MonoBehaviour
     public GameObject Player;
     public CinemachineCamera VirtualCameraVeil;
     public RectTransform worldCursorUI;
-    public MiniMap MiniMap;
+    // public MiniMas
     public PlayerMovement PlayerMovement;
     public InputManager InputManager;
     public SpaceTimeSystem SpaceTimeSystem;
@@ -16,6 +16,9 @@ public class GlobalDataStore : MonoBehaviour
     public StarfieldColorManager StarfieldColorManager;
     public SphereCollider PlanetCollider;
     public Transform DebugParent;
+    public PlanetFormationBase PlanetFormationBase;
+    public SectorManager SectorManager;
+    public SectorUIPanel SectorUIPanel;
 
     private void Awake()
     {

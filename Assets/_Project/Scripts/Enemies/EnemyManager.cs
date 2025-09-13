@@ -6,8 +6,6 @@ using Random=UnityEngine.Random;
 public class EnemyManager : MonoBehaviour
 {
     public static EnemyManager Instance;
-    public Transform playerScentNodeParent;
-    public List<ScentNode> PlayerScentNodes;
     public bool ShowEnemyDebugRays = true;
     public int MaxEnemyAttackPoints = 3;
     public int CurrentEnemyAttackPoints = 0;
@@ -23,13 +21,6 @@ public class EnemyManager : MonoBehaviour
         }
         Instance = this;
         DontDestroyOnLoad(gameObject);
-
-        PlayerScentNodes.Clear();
-        foreach (Transform scentNode in playerScentNodeParent)
-        {
-            scentNode.AddComponent<ScentNode>();
-            PlayerScentNodes.Add(scentNode.GetComponent<ScentNode>());
-        }
     }
 
 

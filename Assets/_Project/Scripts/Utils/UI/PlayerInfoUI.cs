@@ -8,7 +8,7 @@ using Random=UnityEngine.Random;
 public class PlayerInfoUI : MonoBehaviour
 {
     public bool IsOpen;
-    public MiniMap miniMap;
+    // public MiniMap miniMap;
     public List<CanvasGroup> allUIElementGroupCGList = new List<CanvasGroup>();
     public GameObject playerInfoRoot;
     public CanvasGroup rootCanvasGroup;
@@ -35,7 +35,7 @@ public class PlayerInfoUI : MonoBehaviour
     public IEnumerator OpenPlayerInfo()
     {
         if (IsOpen) yield break;
-        miniMap.Minimize();
+        // miniMap.Minimize();
         IsOpen = true;
         rootCanvasGroup.alpha = 0;
 

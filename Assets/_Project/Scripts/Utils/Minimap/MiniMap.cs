@@ -1,234 +1,244 @@
-using System.Collections.Generic;
-using UnityEngine;
-using DG.Tweening;
-using TMPro;
+// using System.Collections.Generic;
+// using UnityEngine;
+// using DG.Tweening;
+// using TMPro;
 
-public class MiniMap : MonoBehaviour
-{
-    public Transform player;
-    public Transform minimapCamera;
-    public Transform fullScreenView;
-    public RectTransform mapBackground;
-    public float _uiScaleFullscreen = 4;
-    public float _scaleSpeed;
-    public float _uiScaleMinimap = 1;
-    public float _camSizeMinimap = 100;
-    public float _camSizeFullscreen = 7000;
-    public Camera minimapCam;
-    public RectTransform maskUI;
-    public GameObject playerMarker;
-    public List<GameObject> fullScreenOnlyElements = new List<GameObject>();
-    public List<GameObject> miniMapOnlyElements = new List<GameObject>();
-    public enum MiniMapState {MINI, MAX};
-    public MiniMapState miniMapState;
-    public PlayerInfoUI playerInfoUI;
+// public class MiniMap : MonoBehaviour
+// {
+//     public Transform player;
+//     public Transform minimapCamera;
+//     public Transform fullScreenView;
+//     public RectTransform mapBackground;
+//     public float _uiScaleFullscreen = 4;
+//     public float _scaleSpeed;
+//     public float _uiScaleMinimap = 1;
+//     public float _camSizeMinimap = 100;
+//     public float _camSizeFullscreen = 7000;
+//     public Camera minimapCam;
+//     public RectTransform maskUI;
+//     public GameObject playerMarker;
+//     public List<MinimapElement> fullScreenOnlyElements = new List<MinimapElement>();
+//     public List<MinimapElement> miniMapOnlyElements = new List<MinimapElement>();
+//     public enum MiniMapState {MINI, MAX};
+//     public MiniMapState miniMapState;
+//     public PlayerInfoUI playerInfoUI;
 
-    public bool isFullscreen = false;
-    public static bool IsFullscreen;
-    public float _camFollowSpeed = 30;
-    public GameObject mapKeyUIRoot;
-    public CanvasGroup mapKeyCG;
+//     public bool isFullscreen = false;
+//     public static bool IsFullscreen;
+//     public float _camFollowSpeed = 30;
+//     public GameObject mapKeyUIRoot;
+//     public CanvasGroup mapKeyCG;
 
-    public static List<MiniMapKey> miniMapKeys = new List<MiniMapKey>();
-    public static List<MinimapElement> minimapElements = new List<MinimapElement>();
+//     public static List<MiniMapKey> miniMapKeys = new List<MiniMapKey>();
+//     public static List<MinimapElement> minimapElements = new List<MinimapElement>();
 
-    [Header("Panel")]
-    public GameObject panel;
-    public CanvasGroup canvasCG;
-    public TMP_Text titleText;
-    public TMP_Text infoText;
-    public MiniMapKey.MinimapIconType currentIconTypeFiler;
-    public bool CanShowPanel = true;
+//     [Header("Panel")]
+//     public GameObject panel;
+//     public CanvasGroup canvasCG;
+//     public TMP_Text titleText;
+//     public TMP_Text infoText;
+//     public MiniMapKey.MinimapIconType currentIconTypeFiler;
+//     public bool CanShowPanel = true;
 
-    [System.Serializable]
-    public struct PanelKeyData
-    {
-        public MiniMapKey.MinimapIconType keyType;
-        public string description;
-    }
+//     [System.Serializable]
+//     public struct PanelKeyData
+//     {
+//         public MiniMapKey.MinimapIconType keyType;
+//         public string description;
+//     }
 
-    public List<PanelKeyData> allKeyItems = new List<PanelKeyData>();
+//     public List<PanelKeyData> allKeyItems = new List<PanelKeyData>();
 
-    private void Start()
-    {
-        canvasCG.alpha = 1;
-        Minimize();
-    }
+//     private void Start()
+//     {
+//         canvasCG.alpha = 1;
+//         Minimize();
+//     }
 
-    void Update()
-    {
-        if (!isFullscreen)
-        {
-            minimapCamera.transform.position = Vector3.Lerp(minimapCamera.transform.position, new Vector3(player.transform.position.x, transform.position.y, player.transform.position.z), Time.deltaTime * _camFollowSpeed);
-        }
-        else
-        {
-            minimapCamera.transform.DOMove(fullScreenView.position, _scaleSpeed).SetEase(Ease.Linear);
-        }
+//     void Update()
+//     {
+//         if (!isFullscreen)
+//         {
+//             minimapCamera.transform.position = Vector3.Lerp(minimapCamera.transform.position, new Vector3(player.transform.position.x, transform.position.y, player.transform.position.z), Time.deltaTime * _camFollowSpeed);
+//         }
+//         else
+//         {
+//             minimapCamera.transform.DOMove(fullScreenView.position, _scaleSpeed).SetEase(Ease.Linear);
+//         }
 
-        IsFullscreen = isFullscreen;
+//         IsFullscreen = isFullscreen;
 
-        if (playerInfoUI.IsOpen) return;
-        panel.SetActive(IsAnythingHovered() && CanShowPanel && IsFullscreen);
-        FlashMapElements();
-    }
-
-
-
-    public bool IsAnythingHovered()
-    {
-        for (int i = 0; i < miniMapKeys.Count; i++)
-        {
-            if (miniMapKeys[i].Hovered) return true;
-        }
-
-        return false;
-    }
-
-
-    public void ForceClosePanel()
-    {
-        for (int i = 0; i < miniMapKeys.Count; i++)
-        {
-            miniMapKeys[i].Hovered = false;
-        }
-    }
-
-
-    public static void AddMiniMapKey(MiniMapKey marker)
-    {
-        if (!miniMapKeys.Contains(marker))
-        {
-            miniMapKeys.Add(marker);
-        }
-    }
+//         if (playerInfoUI.IsOpen) return;
+//         panel.SetActive(IsAnythingHovered() && CanShowPanel && IsFullscreen);
+//         FlashMapElements();
+//     }
 
 
 
-    public void ToggleMinimapScale()
-    {
-        if (playerInfoUI.IsOpen) return;
-        if (isFullscreen)
-        {
-            Minimize();
-        }
-        else
-        {
-            Maximize();
-        }
+//     public bool IsAnythingHovered()
+//     {
+//         for (int i = 0; i < miniMapKeys.Count; i++)
+//         {
+//             if (miniMapKeys[i].Hovered) return true;
+//         }
 
-        isFullscreen = !isFullscreen;
+//         return false;
+//     }
 
-    }
 
-    public void Minimize()
-    {
-        if (miniMapState == MiniMapState.MINI) return;
-        CanShowPanel = false;
-        mapKeyCG.DOFade(0, .1f).SetEase(Ease.InOutSine).OnComplete(() =>
-        {
-            mapKeyUIRoot.SetActive(false);
-        });
-        maskUI.DOSizeDelta(new Vector2(_uiScaleMinimap, _uiScaleMinimap), _scaleSpeed).SetEase(Ease.InOutSine);
-        mapBackground.DOSizeDelta(new Vector2(_uiScaleMinimap + 10, _uiScaleMinimap + 10), _scaleSpeed).SetEase(Ease.InOutSine);
-        minimapCam.DOOrthoSize(_camSizeMinimap, _scaleSpeed).SetEase(Ease.InOutSine);
-        playerMarker.transform.DOScale(.2f, _scaleSpeed).SetEase(Ease.InOutSine);
-        minimapCamera.transform.DOMove(new Vector3(player.transform.position.x, transform.position.y, player.transform.position.z), _scaleSpeed).SetEase(Ease.InOutSine);
+//     public void ForceClosePanel()
+//     {
+//         for (int i = 0; i < miniMapKeys.Count; i++)
+//         {
+//             miniMapKeys[i].Hovered = false;
+//         }
+//     }
+
+
+//     public static void AddMiniMapKey(MiniMapKey marker)
+//     {
+//         if (!miniMapKeys.Contains(marker))
+//         {
+//             miniMapKeys.Add(marker);
+//         }
+//     }
 
 
 
+//     public void ToggleMinimapScale()
+//     {
+//         if (playerInfoUI.IsOpen) return;
+//         if (isFullscreen)
+//         {
+//             Minimize();
+//         }
+//         else
+//         {
+//             Maximize();
+//         }
 
-        for (int i = 0; i < fullScreenOnlyElements.Count; i++)
-        {
-            fullScreenOnlyElements[i].SetActive(false);
-        }
+//         isFullscreen = !isFullscreen;
 
-        for (int i = 0; i < miniMapOnlyElements.Count; i++)
-        {
-            miniMapOnlyElements[i].SetActive(true);
-        }
+//     }
 
-        miniMapState = MiniMapState.MINI;
-    }
-
-    public void Maximize()
-    {
-        // maximizing
-        if (miniMapState == MiniMapState.MAX || playerInfoUI.IsOpen) return;
-        CanShowPanel = true;
-        maskUI.DOSizeDelta(new Vector2(_uiScaleFullscreen, _uiScaleFullscreen), _scaleSpeed).SetEase(Ease.InOutSine);
-        mapBackground.DOSizeDelta(new Vector2(_uiScaleFullscreen + 10, _uiScaleFullscreen + 10), _scaleSpeed).SetEase(Ease.InOutSine);
-        mapKeyUIRoot.SetActive(true);
-        mapKeyCG.DOFade(.9f, .5f).SetEase(Ease.InSine);
-        minimapCam.DOOrthoSize(_camSizeFullscreen, _scaleSpeed).SetEase(Ease.InOutSine);
-        playerMarker.transform.DOScale(4, _scaleSpeed).SetEase(Ease.InOutSine);
-
-
-
-        for (int i = 0; i < fullScreenOnlyElements.Count; i++)
-        {
-            fullScreenOnlyElements[i].SetActive(true);
-        }
-
-        for (int i = 0; i < miniMapOnlyElements.Count; i++)
-        {
-            miniMapOnlyElements[i].SetActive(false);
-        }
-
-        miniMapState = MiniMapState.MAX;
-    }
+//     public void Minimize()
+//     {
+//         if (miniMapState == MiniMapState.MINI) return;
+//         CanShowPanel = false;
+//         mapKeyCG.DOFade(0, .1f).SetEase(Ease.InOutSine).OnComplete(() =>
+//         {
+//             mapKeyUIRoot.SetActive(false);
+//         });
+//         maskUI.DOSizeDelta(new Vector2(_uiScaleMinimap, _uiScaleMinimap), _scaleSpeed).SetEase(Ease.InOutSine);
+//         mapBackground.DOSizeDelta(new Vector2(_uiScaleMinimap + 10, _uiScaleMinimap + 10), _scaleSpeed).SetEase(Ease.InOutSine);
+//         minimapCam.DOOrthoSize(_camSizeMinimap, _scaleSpeed).SetEase(Ease.InOutSine);
+//         playerMarker.transform.DOScale(.2f, _scaleSpeed).SetEase(Ease.InOutSine);
+//         minimapCamera.transform.DOMove(new Vector3(player.transform.position.x, transform.position.y, player.transform.position.z), _scaleSpeed).SetEase(Ease.InOutSine);
 
 
 
-    public void FlashMapElements()
-    {
-        if (!IsAnythingHovered())
-        {
-            foreach (MinimapElement minimapElement in minimapElements)
-            {
-                minimapElement.canvasGroupFlasher.StopFlashing();
-            }
-            return;
-        }
+
+//         for (int i = 0; i < fullScreenOnlyElements.Count; i++)
+//         {
+//             fullScreenOnlyElements[i].gameObject.SetActive(false);
+//         }
+
+//         for (int i = 0; i < miniMapOnlyElements.Count; i++)
+//         {
+//             miniMapOnlyElements[i].gameObject.SetActive(true);
+//         }
+
+//         foreach (MinimapElement minimapElement in fullScreenOnlyElements)
+//         {
+//             minimapElement.gameObject.transform.DOScale(minimapElement.minimapSize, _scaleSpeed).SetEase(Ease.InOutSine);
+//         }
+
+//         miniMapState = MiniMapState.MINI;
+//     }
+
+//     public void Maximize()
+//     {
+//         // maximizing
+//         if (miniMapState == MiniMapState.MAX || playerInfoUI.IsOpen) return;
+//         CanShowPanel = true;
+//         maskUI.DOSizeDelta(new Vector2(_uiScaleFullscreen, _uiScaleFullscreen), _scaleSpeed).SetEase(Ease.InOutSine);
+//         mapBackground.DOSizeDelta(new Vector2(_uiScaleFullscreen + 10, _uiScaleFullscreen + 10), _scaleSpeed).SetEase(Ease.InOutSine);
+//         mapKeyUIRoot.SetActive(true);
+//         mapKeyCG.DOFade(.9f, .5f).SetEase(Ease.InSine);
+//         minimapCam.DOOrthoSize(_camSizeFullscreen, _scaleSpeed).SetEase(Ease.InOutSine);
+//         playerMarker.transform.DOScale(4, _scaleSpeed).SetEase(Ease.InOutSine);
+
+
+
+//         for (int i = 0; i < fullScreenOnlyElements.Count; i++)
+//         {
+//             fullScreenOnlyElements[i].gameObject.SetActive(true);
+//         }
+
+//         for (int i = 0; i < miniMapOnlyElements.Count; i++)
+//         {
+//             miniMapOnlyElements[i].gameObject.SetActive(false);
+//         }
+
+//         foreach (MinimapElement minimapElement in fullScreenOnlyElements)
+//         {
+//             minimapElement.gameObject.transform.DOScale(minimapElement.fullScreenSize, _scaleSpeed).SetEase(Ease.InOutSine);
+//         }
+
+//         miniMapState = MiniMapState.MAX;
+//     }
+
+
+
+//     public void FlashMapElements()
+//     {
+//         if (!IsAnythingHovered())
+//         {
+//             foreach (MinimapElement minimapElement in minimapElements)
+//             {
+//                 minimapElement.canvasGroupFlasher.StopFlashing();
+//             }
+//             return;
+//         }
         
 
-        foreach (MinimapElement minimapElement in minimapElements)
-        {
-            if (minimapElement.minimapIconType == currentIconTypeFiler)
-            {
-                minimapElement.canvasGroupFlasher.StartFlashing();
-            }
-            else
-            {
-                minimapElement.canvasGroupFlasher.StopFlashing();
-            }
-        }
-    }
+//         foreach (MinimapElement minimapElement in minimapElements)
+//         {
+//             if (minimapElement.minimapIconType == currentIconTypeFiler)
+//             {
+//                 minimapElement.canvasGroupFlasher.StartFlashing();
+//             }
+//             else
+//             {
+//                 minimapElement.canvasGroupFlasher.StopFlashing();
+//             }
+//         }
+//     }
 
 
-    public void UpdatePanelData(MiniMapKey.MinimapIconType keyType)
-    {
-        Debug.Log("Showing Panel");
-        currentIconTypeFiler = keyType;
+//     public void UpdatePanelData(MiniMapKey.MinimapIconType keyType)
+//     {
+//         Debug.Log("Showing Panel");
+//         currentIconTypeFiler = keyType;
 
-        PanelKeyData panelKeyData = allKeyItems.Find(item => item.keyType == keyType);
+//         PanelKeyData panelKeyData = allKeyItems.Find(item => item.keyType == keyType);
 
-        titleText.text = panelKeyData.keyType.ToString();
-        infoText.text = panelKeyData.description;
-    }
+//         titleText.text = panelKeyData.keyType.ToString();
+//         infoText.text = panelKeyData.description;
+//     }
 
-    public void HidePanel()
-    {
-        Debug.Log("Hiding Panel");
-        ForceClosePanel();
-        foreach (MinimapElement minimapElement in minimapElements)
-        {
-            minimapElement.canvasGroupFlasher.StopFlashing();
-        }
+//     public void HidePanel()
+//     {
+//         Debug.Log("Hiding Panel");
+//         ForceClosePanel();
+//         foreach (MinimapElement minimapElement in minimapElements)
+//         {
+//             minimapElement.canvasGroupFlasher.StopFlashing();
+//         }
 
-        panel.SetActive(false);
+//         panel.SetActive(false);
 
-        titleText.text = "";
-        infoText.text = "";
-    }
-}
+//         titleText.text = "";
+//         infoText.text = "";
+//     }
+// }

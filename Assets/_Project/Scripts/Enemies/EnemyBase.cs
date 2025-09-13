@@ -417,7 +417,7 @@ public abstract class EnemyBase : MonoBehaviour, IPoolable
 
     public void TakeDamage(int damage, StatusEffectBase.StatusEffectType statusEffectType = StatusEffectBase.StatusEffectType.NONE, int statusApplicationChance = 0)
     {
-        Debug.Log("enemy taking damage | Status Effect: " + statusEffectType.ToString());
+        // Debug.Log("enemy taking damage | Status Effect: " + statusEffectType.ToString());
         CurrentHealth = Mathf.Clamp(CurrentHealth - damage, 0, MaxHealth);
         healthUI.UpdateHealthText();
         meshFlashEffect.FlashAll(new MeshFlashEffect.FlashData(ColorManager.Instance.normalHitFlashMat, .1f));
@@ -433,7 +433,7 @@ public abstract class EnemyBase : MonoBehaviour, IPoolable
         // we know there is a passed status effect chance event
         if (Random.Range(0, 100) < statusApplicationChance)
         {
-            Debug.Log("Adding Status to enemy");
+            // Debug.Log("Adding Status to enemy");
             statusEffectEnemyManager.AddStatus(statusEffectType, StatusEffectPlayerManager.Instance.GetStatusPrefab(statusEffectType));
         }
 

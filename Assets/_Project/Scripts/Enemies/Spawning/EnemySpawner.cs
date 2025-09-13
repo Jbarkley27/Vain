@@ -11,7 +11,6 @@ public class EnemySpawner : MonoBehaviour
     public Transform spawnParent;
     public EnemyPooler pooler;
     public Transform player;
-    public int currentTier = 1;
     public Planet planet;
     public float despawnDelay = 10f;
     private Coroutine despawnCoroutine;
@@ -26,6 +25,7 @@ public class EnemySpawner : MonoBehaviour
     [Header("Debug")]
     public WaveConfig testWaveConfig;
     public bool DebugMode = false;
+    public bool DisableSpawning = false;
 
     void Awake()
     {
@@ -48,7 +48,6 @@ public class EnemySpawner : MonoBehaviour
         if (DebugMode)
         {
             Debug.Log("Bypassing Debug Mode for now");
-            // SpawnTestSubjects();
         }
     }
 
@@ -56,6 +55,8 @@ public class EnemySpawner : MonoBehaviour
     {
         if (other.CompareTag("Player"))
         {
+            if (DisableSpawning) return;
+            
             isPlayerInZone = true;
 
             // If player re-enters the planet region, cancel the despawn coroutine
@@ -78,8 +79,6 @@ public class EnemySpawner : MonoBehaviour
             {
                 Debug.Log("Player still in combat, enemy state reamins");
             }
-
-            // SpawnWave(); // this was causing double enemies to spawn
         }
     }
 
@@ -120,28 +119,10 @@ public class EnemySpawner : MonoBehaviour
         despawnCoroutine = null;
     }
 
-    public void SpawnTestSubjects()
-    {
-        Debug.Log("Spawning enemies for " + planet.Name);
-        // Planet currentPlanetPlayerIsOn = planetDetector.CurrentPlanetObject;
-        foreach (var entry in testWaveConfig.enemies)
-        {
-            for (int i = 0; i < entry.count; i++)
-            {
-                Vector3 spawnPos = EnemyManager.Instance.PlayerScentNodes[Random.Range(0, EnemyManager.Instance.PlayerScentNodes.Count)].gameObject.transform.position;
-
-                GameObject enemyObj = pooler.Spawn(entry.enemyID, spawnPos, Quaternion.identity);
-                EnemyBase enemy = enemyObj.GetComponent<EnemyBase>();
-                if (!enemy.IsSetup) enemy.Setup(entry.tier, player, this, true);
-                activeEnemies.Add(enemy);
-            }
-        }
-    }
 
     void SpawnWave()
     {
         Debug.Log("Spawning enemies for " + planet.Name);
-        // Planet currentPlanetPlayerIsOn = planetDetector.CurrentPlanetObject;
         foreach (var entry in waveConfig.enemies)
         {
             for (int i = 0; i < entry.count; i++)
@@ -194,11 +175,9 @@ public class EnemySpawner : MonoBehaviour
         NavMeshHit hit;
         if (NavMesh.SamplePosition(point, out hit, 2f, NavMesh.AllAreas))
         {
-            // Debug.Log("Position + " + hit.position);
             return hit.position;
         }
 
-        // Debug.Log("Position Outside --  " + point);
         return point; // fallback
     }
 }

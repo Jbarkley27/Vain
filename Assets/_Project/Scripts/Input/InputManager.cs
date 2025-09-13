@@ -6,7 +6,7 @@ public class InputManager : MonoBehaviour
     [Header("General")]
     private PlayerInput _playerInput;
     private PlayerMovement _playerMovement;
-    public MiniMap _miniMap;
+    // public MiniMap _miniMap;
     public bool CanAcceptInputs = true;
     public PlayerInfoUI playerInfoUI;
 
@@ -28,6 +28,7 @@ public class InputManager : MonoBehaviour
 
     [Header("Confirm Prompt")]
     public bool ConfirmPromptPressed = false;
+    public bool ConfirmPromptHeld = false;
 
     [Header("Player Info")]
     public bool PlayerInfoPressed = false;
@@ -52,6 +53,7 @@ public class InputManager : MonoBehaviour
         GetCurrentDevice();
         Boost();
         Shoot();
+        HoldToConfirm();
     }
 
 
@@ -102,7 +104,7 @@ public class InputManager : MonoBehaviour
     {
         if (context.performed)
         {
-            _miniMap.ToggleMinimapScale();
+            // MapManager.Instance.ToggleMinimapScale();
         }
     }
 
@@ -117,6 +119,19 @@ public class InputManager : MonoBehaviour
         else
         {
             IsShooting = false;
+        }
+    }
+
+
+    public void HoldToConfirm()
+    {
+        if (_playerInput.actions["HoldToConfirm"].IsPressed())
+        {
+            ConfirmPromptHeld = true;
+        }
+        else
+        {
+            ConfirmPromptHeld = false;
         }
     }
 
@@ -199,7 +214,7 @@ public class InputManager : MonoBehaviour
     {
         if (context.performed)
         {
-            GlobalDataStore.Instance.StarSystemManager.LoadIntoPlanetarySystem(Random.Range(0, GlobalDataStore.Instance.StarSystemManager.sectorManager.OuterSectorPlanets.Count));
+            // GlobalDataStore.Instance.StarSystemManager.LoadIntoPlanetarySystem(Random.Range(0, GlobalDataStore.Instance.StarSystemManager.sectorManager.OuterSectorPlanets.Count));
         }
 
     }

@@ -241,14 +241,52 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Name: 
   Size: 80
-  AvailablePOIGradeCTypes: 
-  AvailablePOIGradeBTypes: 
-  AvailablePOIGradeATypes: 
-  MaxGradeCPOICount: 0
-  MaxGradeBPOICount: 0
-  MaxGradeAPOICount: 0
+  AvailablePOIGradeCTypes:
+  - {fileID: 8161053307631703780, guid: af185e6926b97481a894dfddbf937dd1, type: 3}
+  - {fileID: 8161053307631703780, guid: af185e6926b97481a894dfddbf937dd1, type: 3}
+  - {fileID: 8161053307631703780, guid: af185e6926b97481a894dfddbf937dd1, type: 3}
+  - {fileID: 8161053307631703780, guid: af185e6926b97481a894dfddbf937dd1, type: 3}
+  - {fileID: 8161053307631703780, guid: af185e6926b97481a894dfddbf937dd1, type: 3}
+  - {fileID: 8161053307631703780, guid: af185e6926b97481a894dfddbf937dd1, type: 3}
+  - {fileID: 8161053307631703780, guid: af185e6926b97481a894dfddbf937dd1, type: 3}
+  - {fileID: 8161053307631703780, guid: af185e6926b97481a894dfddbf937dd1, type: 3}
+  - {fileID: 8161053307631703780, guid: af185e6926b97481a894dfddbf937dd1, type: 3}
+  - {fileID: 8161053307631703780, guid: af185e6926b97481a894dfddbf937dd1, type: 3}
+  - {fileID: 8161053307631703780, guid: af185e6926b97481a894dfddbf937dd1, type: 3}
+  AvailablePOIGradeBTypes:
+  - {fileID: 5660311159059409059, guid: 6427f5fb8ca384e09b4d0eab44a103f2, type: 3}
+  - {fileID: 5660311159059409059, guid: 6427f5fb8ca384e09b4d0eab44a103f2, type: 3}
+  - {fileID: 5660311159059409059, guid: 6427f5fb8ca384e09b4d0eab44a103f2, type: 3}
+  - {fileID: 5660311159059409059, guid: 6427f5fb8ca384e09b4d0eab44a103f2, type: 3}
+  - {fileID: 5660311159059409059, guid: 6427f5fb8ca384e09b4d0eab44a103f2, type: 3}
+  - {fileID: 5660311159059409059, guid: 6427f5fb8ca384e09b4d0eab44a103f2, type: 3}
+  - {fileID: 5660311159059409059, guid: 6427f5fb8ca384e09b4d0eab44a103f2, type: 3}
+  - {fileID: 5660311159059409059, guid: 6427f5fb8ca384e09b4d0eab44a103f2, type: 3}
+  - {fileID: 5660311159059409059, guid: 6427f5fb8ca384e09b4d0eab44a103f2, type: 3}
+  AvailablePOIGradeATypes:
+  - {fileID: 8059146690934326327, guid: 563a2a3608f7a4975b7a24e71873d7b9, type: 3}
+  - {fileID: 8059146690934326327, guid: 563a2a3608f7a4975b7a24e71873d7b9, type: 3}
+  - {fileID: 8059146690934326327, guid: 563a2a3608f7a4975b7a24e71873d7b9, type: 3}
+  - {fileID: 8059146690934326327, guid: 563a2a3608f7a4975b7a24e71873d7b9, type: 3}
+  - {fileID: 8059146690934326327, guid: 563a2a3608f7a4975b7a24e71873d7b9, type: 3}
+  - {fileID: 8059146690934326327, guid: 563a2a3608f7a4975b7a24e71873d7b9, type: 3}
+  - {fileID: 8059146690934326327, guid: 563a2a3608f7a4975b7a24e71873d7b9, type: 3}
+  - {fileID: 8059146690934326327, guid: 563a2a3608f7a4975b7a24e71873d7b9, type: 3}
+  - {fileID: 8059146690934326327, guid: 563a2a3608f7a4975b7a24e71873d7b9, type: 3}
+  - {fileID: 8059146690934326327, guid: 563a2a3608f7a4975b7a24e71873d7b9, type: 3}
+  - {fileID: 8059146690934326327, guid: 563a2a3608f7a4975b7a24e71873d7b9, type: 3}
+  - {fileID: 8059146690934326327, guid: 563a2a3608f7a4975b7a24e71873d7b9, type: 3}
+  MaxGradeCPOICount: 5
+  MaxGradeBPOICount: 4
+  MaxGradeAPOICount: 8
   PlanetStarfieldColor: {r: 0.2582707, g: 0.15886435, b: 0.3207547, a: 1}
   RotationSpeed: 1
+  GradeCSelectedPositions: []
+  GradeBSelectedPositions: []
+  GradeASelectedPositions: []
+  C_POIEvents: []
+  B_POIEvents: []
+  A_POIEvents: []
 --- !u!1 &7600859715918138647
 GameObject:
   m_ObjectHideFlags: 0

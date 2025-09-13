@@ -9,6 +9,7 @@ public class CorrodedStatusEffect : StatusEffectBase
 
     public override void ApplyStatus(bool IsPlayer, EnemyBase enemy = null)
     {
+        if (this == null || !gameObject.activeInHierarchy) return;
         FlashCanvasGroup();
         enemyTarget = enemy;
         StartCoroutine(Corrode());

@@ -34,13 +34,13 @@ public class CanvasGroupFlasher : MonoBehaviour
             .SetEase(Ease.InOutSine);
     }
 
-    public void StopFlashing()
+    public void StopFlashing(float overrideEndValue = -1)
     {
         if (!IsFlashing) return;
         if (flashTween != null && flashTween.IsActive())
         {
             flashTween.Kill();
-            canvasGroup.alpha = alphaMax; // reset alpha
+            canvasGroup.alpha = overrideEndValue == -1 ? alphaMax : overrideEndValue; // reset alpha
             IsFlashing = false;
         }
     }

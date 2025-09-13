@@ -123,10 +123,89 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Name: Virex
   Size: 200
-  AvailablePOIGradeCTypes: 
-  AvailablePOIGradeBTypes: 
-  AvailablePOIGradeATypes: 
-  MaxGradeCPOICount: 0
-  MaxGradeBPOICount: 0
-  MaxGradeAPOICount: 0
+  AvailablePOIGradeCTypes:
+  - {fileID: 8161053307631703780, guid: af185e6926b97481a894dfddbf937dd1, type: 3}
+  - {fileID: 8161053307631703780, guid: af185e6926b97481a894dfddbf937dd1, type: 3}
+  - {fileID: 8161053307631703780, guid: af185e6926b97481a894dfddbf937dd1, type: 3}
+  - {fileID: 8161053307631703780, guid: af185e6926b97481a894dfddbf937dd1, type: 3}
+  - {fileID: 8161053307631703780, guid: af185e6926b97481a894dfddbf937dd1, type: 3}
+  - {fileID: 8161053307631703780, guid: af185e6926b97481a894dfddbf937dd1, type: 3}
+  - {fileID: 8161053307631703780, guid: af185e6926b97481a894dfddbf937dd1, type: 3}
+  - {fileID: 8161053307631703780, guid: af185e6926b97481a894dfddbf937dd1, type: 3}
+  - {fileID: 8161053307631703780, guid: af185e6926b97481a894dfddbf937dd1, type: 3}
+  - {fileID: 8161053307631703780, guid: af185e6926b97481a894dfddbf937dd1, type: 3}
+  - {fileID: 8161053307631703780, guid: af185e6926b97481a894dfddbf937dd1, type: 3}
+  AvailablePOIGradeBTypes:
+  - {fileID: 5660311159059409059, guid: 6427f5fb8ca384e09b4d0eab44a103f2, type: 3}
+  - {fileID: 5660311159059409059, guid: 6427f5fb8ca384e09b4d0eab44a103f2, type: 3}
+  - {fileID: 5660311159059409059, guid: 6427f5fb8ca384e09b4d0eab44a103f2, type: 3}
+  - {fileID: 5660311159059409059, guid: 6427f5fb8ca384e09b4d0eab44a103f2, type: 3}
+  - {fileID: 5660311159059409059, guid: 6427f5fb8ca384e09b4d0eab44a103f2, type: 3}
+  - {fileID: 5660311159059409059, guid: 6427f5fb8ca384e09b4d0eab44a103f2, type: 3}
+  - {fileID: 5660311159059409059, guid: 6427f5fb8ca384e09b4d0eab44a103f2, type: 3}
+  - {fileID: 5660311159059409059, guid: 6427f5fb8ca384e09b4d0eab44a103f2, type: 3}
+  - {fileID: 5660311159059409059, guid: 6427f5fb8ca384e09b4d0eab44a103f2, type: 3}
+  AvailablePOIGradeATypes:
+  - {fileID: 8059146690934326327, guid: 563a2a3608f7a4975b7a24e71873d7b9, type: 3}
+  - {fileID: 8059146690934326327, guid: 563a2a3608f7a4975b7a24e71873d7b9, type: 3}
+  - {fileID: 8059146690934326327, guid: 563a2a3608f7a4975b7a24e71873d7b9, type: 3}
+  - {fileID: 8059146690934326327, guid: 563a2a3608f7a4975b7a24e71873d7b9, type: 3}
+  - {fileID: 8059146690934326327, guid: 563a2a3608f7a4975b7a24e71873d7b9, type: 3}
+  - {fileID: 8059146690934326327, guid: 563a2a3608f7a4975b7a24e71873d7b9, type: 3}
+  - {fileID: 8059146690934326327, guid: 563a2a3608f7a4975b7a24e71873d7b9, type: 3}
+  - {fileID: 8059146690934326327, guid: 563a2a3608f7a4975b7a24e71873d7b9, type: 3}
+  - {fileID: 8059146690934326327, guid: 563a2a3608f7a4975b7a24e71873d7b9, type: 3}
+  - {fileID: 8059146690934326327, guid: 563a2a3608f7a4975b7a24e71873d7b9, type: 3}
+  - {fileID: 8059146690934326327, guid: 563a2a3608f7a4975b7a24e71873d7b9, type: 3}
+  - {fileID: 8059146690934326327, guid: 563a2a3608f7a4975b7a24e71873d7b9, type: 3}
+  MaxGradeCPOICount: 8
+  MaxGradeBPOICount: 4
+  MaxGradeAPOICount: 8
   PlanetStarfieldColor: {r: 0.10980392, g: 0.4509804, b: 0.4509804, a: 1}
+  RotationSpeed: 0
+  GradeCSelectedPositions:
+  - {x: 1822, y: 0, z: 2478}
+  - {x: -102, y: 0, z: -4618}
+  - {x: -645, y: 0, z: 4185}
+  - {x: -102, y: 0, z: -4618}
+  - {x: -645, y: 0, z: 4185}
+  - {x: -102, y: 0, z: -4618}
+  - {x: -645, y: 0, z: 4185}
+  - {x: -102, y: 0, z: -4618}
+  GradeBSelectedPositions:
+  - {x: -1511, y: 0, z: 523}
+  - {x: 3735, y: 0, z: 950}
+  - {x: -4116, y: 0, z: 314}
+  - {x: 3735, y: 0, z: 950}
+  GradeASelectedPositions:
+  - {x: 2271, y: 0, z: -1231}
+  - {x: -3016, y: 0, z: 1506}
+  - {x: 4142, y: 0, z: -194}
+  - {x: -3016, y: 0, z: 1506}
+  - {x: 4142, y: 0, z: -194}
+  - {x: -3016, y: 0, z: 1506}
+  - {x: 4142, y: 0, z: -194}
+  - {x: -3016, y: 0, z: 1506}
+  C_POIEvents:
+  - {fileID: 8161053307631703780, guid: af185e6926b97481a894dfddbf937dd1, type: 3}
+  - {fileID: 8161053307631703780, guid: af185e6926b97481a894dfddbf937dd1, type: 3}
+  - {fileID: 8161053307631703780, guid: af185e6926b97481a894dfddbf937dd1, type: 3}
+  - {fileID: 8161053307631703780, guid: af185e6926b97481a894dfddbf937dd1, type: 3}
+  - {fileID: 8161053307631703780, guid: af185e6926b97481a894dfddbf937dd1, type: 3}
+  - {fileID: 8161053307631703780, guid: af185e6926b97481a894dfddbf937dd1, type: 3}
+  - {fileID: 8161053307631703780, guid: af185e6926b97481a894dfddbf937dd1, type: 3}
+  - {fileID: 8161053307631703780, guid: af185e6926b97481a894dfddbf937dd1, type: 3}
+  B_POIEvents:
+  - {fileID: 5660311159059409059, guid: 6427f5fb8ca384e09b4d0eab44a103f2, type: 3}
+  - {fileID: 5660311159059409059, guid: 6427f5fb8ca384e09b4d0eab44a103f2, type: 3}
+  - {fileID: 5660311159059409059, guid: 6427f5fb8ca384e09b4d0eab44a103f2, type: 3}
+  - {fileID: 5660311159059409059, guid: 6427f5fb8ca384e09b4d0eab44a103f2, type: 3}
+  A_POIEvents:
+  - {fileID: 8059146690934326327, guid: 563a2a3608f7a4975b7a24e71873d7b9, type: 3}
+  - {fileID: 8059146690934326327, guid: 563a2a3608f7a4975b7a24e71873d7b9, type: 3}
+  - {fileID: 8059146690934326327, guid: 563a2a3608f7a4975b7a24e71873d7b9, type: 3}
+  - {fileID: 8059146690934326327, guid: 563a2a3608f7a4975b7a24e71873d7b9, type: 3}
+  - {fileID: 8059146690934326327, guid: 563a2a3608f7a4975b7a24e71873d7b9, type: 3}
+  - {fileID: 8059146690934326327, guid: 563a2a3608f7a4975b7a24e71873d7b9, type: 3}
+  - {fileID: 8059146690934326327, guid: 563a2a3608f7a4975b7a24e71873d7b9, type: 3}
+  - {fileID: 8059146690934326327, guid: 563a2a3608f7a4975b7a24e71873d7b9, type: 3}

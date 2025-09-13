@@ -133,6 +133,12 @@ public class WorldCursor : MonoBehaviour
                 // Do something here
                 CurrentHoveredGO = result.gameObject;
             }
+
+            if (result.gameObject.CompareTag("MapElement"))
+            {
+                // Debug.Log("Hovering over map element");
+                CurrentHoveredGO = result.gameObject;
+            }
         }
     }
 
@@ -157,7 +163,7 @@ public class WorldCursor : MonoBehaviour
                 // AudioManager.Instance.PlayOneShot(AudioLibrary.Hover_Over_Enemy);
             }
 
-            IsHoveringOverEnemy =  true;
+            IsHoveringOverEnemy = true;
         }
         else
         {
@@ -169,5 +175,10 @@ public class WorldCursor : MonoBehaviour
 
             IsHoveringOverEnemy = false;
         }
+    }
+
+    public Vector3 GetCursorPosition()
+    {
+        return cursorImage.transform.position;
     }
 }
