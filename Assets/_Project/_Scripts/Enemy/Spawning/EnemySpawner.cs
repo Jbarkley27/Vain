@@ -4,9 +4,11 @@ using UnityEngine;
 using UnityEngine.AI;
 using Random=UnityEngine.Random;
 
+// The collider on this object controls the zone for when enemies will begin to spawn
 public class EnemySpawner : MonoBehaviour
 {
-    public WaveConfig waveConfig;
+    public List<WaveConfig> waveConfigs;
+    public WaveConfig currentWaveConfig;
     public List<Transform> spawnPoints;
     public Transform spawnParent;
     public EnemyPooler pooler;
@@ -17,15 +19,11 @@ public class EnemySpawner : MonoBehaviour
     public bool isPlayerInZone = false;
     private bool enemiesSpawned = false;
     public List<EnemyBase> activeEnemies = new List<EnemyBase>();
-    public PlanetDetector planetDetector;
     public List<GameObject> PlanetWanderNodes;
-    public Transform enemyWanderNodeParent;
-
-
-    [Header("Debug")]
-    public WaveConfig testWaveConfig;
     public bool DebugMode = false;
     public bool DisableSpawning = false;
+    public bool spawning;
+
 
     void Awake()
     {
@@ -35,28 +33,43 @@ public class EnemySpawner : MonoBehaviour
             spawnPoints.Add(point);
         }
 
-         PlanetWanderNodes.Clear();
+        PlanetWanderNodes.Clear();
 
-        foreach (Transform scentNode in enemyWanderNodeParent)
-        {
-            PlanetWanderNodes.Add(scentNode.gameObject);
-        }
+        // foreach (Transform scentNode in enemyWanderNodeParent)
+        // {
+        //     PlanetWanderNodes.Add(scentNode.gameObject);
+        // }
     }
 
     void Start()
     {
-        if (DebugMode)
-        {
-            Debug.Log("Bypassing Debug Mode for now");
-        }
+        // if (DebugMode)
+        // {
+        //     Debug.Log("Bypassing Debug Mode for now");
+        // }
+
+        currentWaveConfig = GetNewWaveConfig();
     }
+
+    public WaveConfig GetNewWaveConfig()
+    {
+        List<WaveConfig> tempList = new List<WaveConfig>();
+        foreach (WaveConfig waveConfig in waveConfigs)
+        {
+            if (waveConfig != currentWaveConfig)
+                tempList.Add(waveConfig);
+        }
+
+        return tempList[Random.Range(0, tempList.Count)];
+    }
+
+
+
 
     private void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Player"))
         {
-            if (DisableSpawning) return;
-            
             isPlayerInZone = true;
 
             // If player re-enters the planet region, cancel the despawn coroutine
@@ -65,8 +78,6 @@ public class EnemySpawner : MonoBehaviour
                 StopCoroutine(despawnCoroutine);
                 despawnCoroutine = null;
             }
-
-
 
             if (!enemiesSpawned)
             {
@@ -77,7 +88,7 @@ public class EnemySpawner : MonoBehaviour
             }
             else
             {
-                Debug.Log("Player still in combat, enemy state reamins");
+                Debug.Log("Player still in combat, enemy state preserved");
             }
         }
     }
@@ -122,8 +133,15 @@ public class EnemySpawner : MonoBehaviour
 
     void SpawnWave()
     {
+        if (DisableSpawning)
+        {
+            Debug.Log("Player Entered Battle Zone but Spawning has been disabled");
+            return;
+        }
+
+
         Debug.Log("Spawning enemies for " + planet.Name);
-        foreach (var entry in waveConfig.enemies)
+        foreach (var entry in currentWaveConfig.enemies)
         {
             for (int i = 0; i < entry.count; i++)
             {
@@ -164,20 +182,13 @@ public class EnemySpawner : MonoBehaviour
         {
             pooler.Despawn(enemy.gameObject, enemy.EnemyID);
         }
-        
+
         activeEnemies.Clear();
     }
 
     Vector3 GetValidSpawnPosition()
     {
-        // Use NavMesh.SamplePosition or spawnPoints[]
         var point = spawnPoints[Random.Range(0, spawnPoints.Count)].position;
-        NavMeshHit hit;
-        if (NavMesh.SamplePosition(point, out hit, 2f, NavMesh.AllAreas))
-        {
-            return hit.position;
-        }
-
         return point; // fallback
     }
 }

@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class StarfieldColorManager : MonoBehaviour
@@ -7,6 +8,7 @@ public class StarfieldColorManager : MonoBehaviour
     public Color currentColor;
     public Color ColorToLerpTo;
     public Color defaultVoidColor;
+    public string OrbitName = "Orbit";
 
     void Awake()
     {

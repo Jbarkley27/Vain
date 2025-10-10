@@ -1,0 +1,32 @@
+using System.Collections.Generic;
+using UnityEngine;
+
+public class PlanetFormationFramework : MonoBehaviour
+{
+    public Planet Planet;
+   
+    [Header("Events")]
+    public List<Event> Events;
+
+    [Header("Other")]
+    public GameObject PlanetEventBounds;
+    public GameObject PlanetEventCameraBounds;
+    public GameObject PlanetOuterBounds;
+    public GameObject PlanetOuterCameraBounds;
+    public Transform LoadInPosition;
+
+
+    void Start()
+    {
+        
+    }
+
+
+    
+
+
+    public void InitiateFormationFramework()
+    {
+
+    }
+}

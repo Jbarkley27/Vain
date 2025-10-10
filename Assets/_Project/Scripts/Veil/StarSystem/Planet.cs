@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Random=UnityEngine.Random;
 
 public class Planet : MonoBehaviour
 {
@@ -70,7 +71,7 @@ public class Planet : MonoBehaviour
             if (i == 0)
             {
                 // First get a random position
-                int randomIndex = Random.Range(0, tempLargePOIList.Count);
+                int randomIndex = UnityEngine.Random.Range(0, tempLargePOIList.Count);
                 GameObject selectedPosition = tempLargePOIList[randomIndex];
                 GradeASelectedPositions.Add(selectedPosition.transform.position);
                 tempLargePOIList.RemoveAt(randomIndex);
@@ -138,11 +139,11 @@ public class Planet : MonoBehaviour
                 C_POIEvents.Add(selectedEvent);
 
                 // create minimap marker
-                MinimapElement newMapElement = Instantiate(MapManager.Instance.planetIconElementPrefab, MapManager.Instance.sectorElementsRoot).GetComponent<MinimapElement>();
+                // MinimapElement newMapElement = Instantiate(MapManager.Instance.planetIconElementPrefab, MapManager.Instance.sectorElementsRoot).GetComponent<MinimapElement>();
 
-                newMapElement.sectorType = sectorType;
-                newMapElement.gameObject.SetActive(false);
-                MapManager.Instance.AddMarkerElement(newMapElement);
+                // newMapElement.sectorType = sectorType;
+                // newMapElement.gameObject.SetActive(false);
+                // MapManager.Instance.AddMarkerElement(newMapElement);
 
                 // Optionally remove the selected event to avoid duplicates
                 tempAvailableGradeC.Remove(selectedEvent);
@@ -178,11 +179,11 @@ public class Planet : MonoBehaviour
                 A_POIEvents.Add(selectedEvent);
 
                 // create minimap marker
-                MinimapElement newMapElement = Instantiate(MapManager.Instance.planetIconElementPrefab, MapManager.Instance.sectorElementsRoot).GetComponent<MinimapElement>();
+                // MinimapElement newMapElement = Instantiate(MapManager.Instance.planetIconElementPrefab, MapManager.Instance.sectorElementsRoot).GetComponent<MinimapElement>();
 
-                newMapElement.sectorType = sectorType;
-                newMapElement.gameObject.SetActive(false);
-                MapManager.Instance.AddMarkerElement(newMapElement);
+                // newMapElement.sectorType = sectorType;
+                // newMapElement.gameObject.SetActive(false);
+                // MapManager.Instance.AddMarkerElement(newMapElement);
 
 
                 // Optionally remove the selected event to avoid duplicates

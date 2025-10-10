@@ -22,7 +22,7 @@ public class StarSystemManager : MonoBehaviour
         }
 
         sectorManager.CreateAllSectors();
-        MapManager.Instance.CreateMap();
+        // MapManager.Instance.CreateMap();
 
         GlobalDataStore.Instance.SpaceTimeSystem.StartAtZero();
 
